@@ -96,6 +96,8 @@ class FaceClassifier:
         if not proba:
             return labels
 
+        max_probas = np.max(probas, axis=1)
+
         return [{'label': l, 'proba': p} for l, p in zip(labels, max_probas)]
 
     def score(self, y_test, y_pred):
