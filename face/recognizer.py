@@ -51,9 +51,6 @@ class FaceRecognizer:
             face_vecs = self.encoder.encode(face_chips)
             face_ids = self.clf.predict(face_vecs, proba=True, threshold=thres)
 
-            unknown = self.clf.UNKNOWN_FACE_LABEL
-            rec_num = sum(1 for face in face_ids if face['label'] != unknown)
-
             for j, face in enumerate(face_ids):
                 face['box'] = self.detector.to_list(face_dets[j].rect)
 

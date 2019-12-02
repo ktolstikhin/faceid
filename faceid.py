@@ -114,7 +114,7 @@ def init(path, force):
         dets = recognizer.detector.detect(img)
 
         if not dets:
-            log.warning(f'No faces found. Ignore image.')
+            log.warning('No faces found. Ignore image.')
             continue
 
         face = dets[0]
@@ -128,7 +128,7 @@ def init(path, force):
         log.info(f'Save aligned face to {face_img_file}')
         Image.fromarray(face_img).save(face_img_file)
 
-        face_emb = recognizer.encoder.encode(face_img)
+        face_emb = recognizer.encoder.encode([face_img])[0]
 
         face_emb_file = os.path.join(img_dir, f'{name}.npy')
         log.info(f'Save face embedding to {face_emb_file}')
