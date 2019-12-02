@@ -25,9 +25,9 @@ class FaceRecognizer:
         with open(self.MODEL_CONF_FILE) as f:
             cfg = json.load(f)
 
-        self.aligner = FaceAligner(cfg['face_shape_predictor'])
-        self.detector = FaceDetector(cfg['face_detector'])
-        self.encoder = FaceEncoder(cfg['face_encoder'])
+        self.aligner = FaceAligner(cfg['face_shape_predictor'], self.log)
+        self.detector = FaceDetector(cfg['face_detector'], self.log)
+        self.encoder = FaceEncoder(cfg['face_encoder'], self.log)
         self.clf = FaceClassifier(cfg['face_classifier'], self.log)
 
         os.chdir(pwd)
