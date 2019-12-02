@@ -58,7 +58,7 @@ class FaceClassifier:
         metrics = self.score(y_test, y_pred)
 
         self.log.info(f'Done. Average test metrics: {metrics}')
-        self.log.info('Train a final model using the whole data set...')
+        self.log.info('Train a final model...')
 
         probas = self.model.predict_proba(X_test)
         self.model.threshold = self.find_best_threshold(probas, y_test)

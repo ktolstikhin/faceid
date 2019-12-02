@@ -33,12 +33,10 @@ class FaceRecognizer:
         os.chdir(pwd)
 
     def recognize(self, images, thres=None):
-        self.log.info(f'Received {len(images)} images.')
         faces = []
 
         for i, img in enumerate(images, start=1):
             face_dets = self.detector.detect(img)
-            self.log.info(f'Image #{i}: Detected {len(face_dets)} faces.')
 
             if not face_dets:
                 faces.append([])
@@ -55,7 +53,6 @@ class FaceRecognizer:
 
             unknown = self.clf.UNKNOWN_FACE_LABEL
             rec_num = sum(1 for face in face_ids if face['label'] != unknown)
-            self.log.info(f'Image #{i}: Recognized {rec_num} faces.')
 
             for j, face in enumerate(face_ids):
                 face['box'] = self.detector.to_list(face_dets[j].rect)
