@@ -2,9 +2,9 @@
 
 TODO
 
-## Install
+## Установка
 
-It is required to compile the Dlib library from source in order to provide a support for CUDA framework:
+Необходимо скомпилировать библиотеку [Dlib](http://dlib.net/) из исходников для обеспечения поддержки платформы параллельных вычислений CUDA:
 ```bash
 apt-get update && apt-get install -y \
     gcc-6 \
@@ -24,11 +24,11 @@ cmake --build ./build
 sudo python3 setup.py install
 ```
 
-## Usage
+## Использование
 
 TODO
 
-## Authors
+## Авторы
 
 Copyright (c) 2019 Konstantin Tolstikhin <k.tolstikhin@gmail.com>
 
