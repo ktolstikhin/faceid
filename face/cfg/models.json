@@ -2,5 +2,5 @@
     "face_detector": "../../models/mmod_human_face_detector.dat",
     "face_encoder": "../../models/dlib_face_recognition_resnet_model_v1.dat",
     "face_shape_predictor": "../../models/shape_predictor_68_face_landmarks.dat",
-    "face_classifier": "../../face_clf.pkl"
+    "face_classifier": "../../models/face_clf.pkl"
 }

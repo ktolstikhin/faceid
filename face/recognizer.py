@@ -4,6 +4,7 @@ import json
 from .aligner import FaceAligner
 from .encoder import FaceEncoder
 from .detector import FaceDetector
+from .classifier import FaceClassifier
 from .utils.logger import init_logger
 
 

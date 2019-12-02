@@ -32,7 +32,7 @@ def model():
 def train(path, output):
     '''Train a face recognizer model.
     '''
-    log.info(f'Train a face recognition model on face DB {path}')
+    log.info(f'Train a face recognition model on the face DB {path}')
 
     recognizer = FaceRecognizer(log)
     recognizer.clf.train(path)
@@ -48,7 +48,7 @@ def train(path, output):
 def test(path):
     '''Test a face recognizer model.
     '''
-    log.info(f'Test a pre-trained face recognition model on face DB {path}')
+    log.info(f'Test a pre-trained face recognition model on the face DB {path}')
     recognizer = FaceRecognizer(log)
     metrics = recognizer.clf.test(path)
     log.info(f'Done. Test metrics: {metrics}')
