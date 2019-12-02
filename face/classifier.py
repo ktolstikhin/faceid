@@ -67,7 +67,7 @@ class FaceClassifier:
         self.log.info(f'Done. Best threshold: {self.model.threshold}')
 
     def find_best_threshold(self, probas, y_true):
-        thresholds = np.arange(self.THRES_MIN, 1.0, 0.01)
+        thresholds = np.arange(self.THRES_MIN, 1.0, 0.01)[::-1]
         corrs = []
 
         for thres in thresholds:
