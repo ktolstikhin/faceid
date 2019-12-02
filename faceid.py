@@ -21,13 +21,47 @@ def faceid():
 
 
 @faceid.group()
+def model():
+    '''A face recognizer model.
+    '''
+
+
+@model.command()
+@click.option('-p', '--path', required=True, help='A path to a face DB.')
+@click.option('-o', '--output', help='A path to the output model.')
+def train(path, output):
+    '''Train a face recognizer model.
+    '''
+    log.info(f'Train a face recognition model on face DB {path}')
+
+    recognizer = FaceRecognizer(log)
+    recognizer.clf.train(path)
+
+    if output is None:
+        output = os.path.join(path, 'face_clf.pkl')
+
+    recognizer.clf.save(output)
+
+
+@model.command()
+@click.option('-p', '--path', required=True, help='A path to a test face DB.')
+def test(path):
+    '''Test a face recognizer model.
+    '''
+    log.info(f'Test a pre-trained face recognition model on face DB {path}')
+    recognizer = FaceRecognizer(log)
+    metrics = recognizer.clf.test(path)
+    log.info(f'Done. Test metrics: {metrics}')
+
+
+@faceid.group()
 def db():
     '''A face DB management.
     '''
 
 
 @db.command()
-@click.option('-p', '--path', help='A path to a face DB.')
+@click.option('-p', '--path', required=True, help='A path to a face DB.')
 @click.option('-f', '--force', is_flag=True,
               help='Force encoding all found images.')
 def init(path, force):
@@ -80,7 +114,7 @@ def init(path, force):
         dets = recognizer.detector.detect(img)
 
         if not dets:
-            log.warning(f'{img_file}: No faces found. Ignore image.')
+            log.warning(f'No faces found. Ignore image.')
             continue
 
         face = dets[0]
