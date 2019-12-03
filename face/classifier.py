@@ -56,13 +56,15 @@ class FaceClassifier:
         y_pred = self.model.predict(X_test)
         self.model.score = self.score(y_test, y_pred)
 
+        score_json = json.dumps(self.model.score['macro avg'], indent=2)
+        self.log.info(f'Done. Test score:\n{score_json}')
         self.log.info('Train a final model...')
 
         probas = self.model.predict_proba(X_test)
         self.model.threshold = self.find_best_threshold(probas, y_test)
 
         self.model.fit(X, y)
-        self.log.info(f'Done. Best threshold: {self.model.threshold}')
+        self.log.info(f'Done. Best threshold: {self.model.threshold:.2f}')
 
     def find_best_threshold(self, probas, y_true):
         thresholds = np.arange(self.THRES_MIN, 1.0, 0.01)[::-1]
