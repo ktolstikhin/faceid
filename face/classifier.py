@@ -1,11 +1,11 @@
 import os
+import json
 from pathlib import Path
 
 import joblib
 import numpy as np
-from sklearn.metrics import matthews_corrcoef
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import matthews_corrcoef, classification_report
 
 from .model.builder import build_model
 from .utils.logger import init_logger
@@ -14,7 +14,6 @@ from .utils.logger import init_logger
 class FaceClassifier:
 
     THRES_MIN = 0.3
-    AVERAGE = 'macro'
     MODEL_PARAMS = None
     UNKNOWN_FACE_LABEL = 'Unknown_Face'
 
@@ -55,9 +54,8 @@ class FaceClassifier:
 
         self.model.fit(X_train, y_train)
         y_pred = self.model.predict(X_test)
-        metrics = self.score(y_test, y_pred)
+        self.model.score = self.score(y_test, y_pred)
 
-        self.log.info(f'Done. Average test metrics: {metrics}')
         self.log.info('Train a final model...')
 
         probas = self.model.predict_proba(X_test)
@@ -89,7 +87,7 @@ class FaceClassifier:
 
         return labels
 
-    def predict(self, face_vecs, proba=False, threshold=None):
+    def predict(self, face_vecs, threshold=None, proba=False):
         probas = self.model.predict_proba(face_vecs)
         labels = self.proba_to_label(probas, threshold)
 
@@ -101,16 +99,7 @@ class FaceClassifier:
         return [{'label': l, 'proba': p} for l, p in zip(labels, max_probas)]
 
     def score(self, y_test, y_pred):
-        prec, recall, f1_score, _ = precision_recall_fscore_support(
-            y_test, y_pred, average=self.AVERAGE)
-
-        metrics = {
-            'precision': f'{prec:.5f}',
-            'recall': f'{recall:.5f}',
-            'f1-score': f'{f1_score:.5f}'
-        }
-
-        return metrics
+        return classification_report(y_test, y_pred, output_dict=True)
 
     def test(self, face_db):
         X_test, y_test = self.get_faces(face_db)

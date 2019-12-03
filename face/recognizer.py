@@ -32,7 +32,7 @@ class FaceRecognizer:
 
         os.chdir(pwd)
 
-    def recognize(self, images, thres=None):
+    def recognize(self, images, threshold=None):
         faces = []
 
         for i, img in enumerate(images, start=1):
@@ -49,7 +49,7 @@ class FaceRecognizer:
                 face_chips.append(chip)
 
             face_vecs = self.encoder.encode(face_chips)
-            face_ids = self.clf.predict(face_vecs, proba=True, threshold=thres)
+            face_ids = self.clf.predict(face_vecs, threshold, proba=True)
 
             for j, face in enumerate(face_ids):
                 face['box'] = self.detector.to_list(face_dets[j].rect)

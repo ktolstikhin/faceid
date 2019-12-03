@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import sys
+import json
 
 import click
 import numpy as np
@@ -42,16 +43,33 @@ def train(path, output):
 
     recognizer.clf.save(output)
 
+    model_file = os.path.splitext(output)[0]
+    score_file = f'{model_file}.json'
+
+    with open(score_file, 'w') as f:
+        score_json = json.dumps(recognizer.clf.model.score, indent=2)
+        f.write(score_json)
+
 
 @model.command()
 @click.option('-p', '--path', required=True, help='A path to a test face DB.')
-def test(path):
+@click.option('-o', '--output', help='A path to output test metrics (JSON).')
+def test(path, output):
     '''Test a face recognizer model.
     '''
-    log.info(f'Test a pre-trained face recognition model on the face DB {path}')
+    log.info(f'Test a face recognition model on the face DB {path}')
+
     recognizer = FaceRecognizer(log)
-    metrics = recognizer.clf.test(path)
-    log.info(f'Done. Test metrics: {metrics}')
+    score = recognizer.clf.test(path)
+
+    score_json = json.dumps(score['macro avg'], indent=2)
+    log.info(f'Done. Test score:\n{score_json}')
+
+    if output is not None:
+
+        with open(output, 'w') as f:
+            score_json = json.dumps(score, indent=2)
+            f.write(score_json)
 
 
 @faceid.group()
