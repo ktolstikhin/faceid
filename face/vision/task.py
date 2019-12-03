@@ -12,6 +12,8 @@ class VisionTask:
     def faces(self):
 
         with self.done:
+            self.done.wait()
+
             return self._faces
 
     @faces.setter

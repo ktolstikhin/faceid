@@ -39,7 +39,7 @@ class VisionTaskHandler(Thread):
 
                 tasks = [t for t in tasks if t is not None]
 
-            images = [t['image'] for t in tasks]
+            images = [t.image for t in tasks]
             faces = self.recognizer.recognize(images, self.batch_size)
 
             for i, task in enumerate(tasks):
