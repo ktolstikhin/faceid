@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial import distance
 
 from .target import Target
-from .utils.plane import box_center
+from .utils import box_center
 
 
 class Tracker:
