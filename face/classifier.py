@@ -52,6 +52,7 @@ class FaceClassifier:
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=test_size)
 
+        self.log.info(f'Data: train {X_train.shape}, test {X_test.shape}')
         self.model.fit(X_train, y_train)
         y_pred = self.model.predict(X_test)
         self.model.score = self.score(y_test, y_pred)

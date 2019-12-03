@@ -29,14 +29,16 @@ def model():
 
 @model.command()
 @click.option('-p', '--path', required=True, help='A path to a face DB.')
+@click.option('-t', '--test-size', type=float, default=0.2,
+              help='A size of the test part of the training data.')
 @click.option('-o', '--output', help='A path to the output model.')
-def train(path, output):
+def train(path, test_size, output):
     '''Train a face recognizer model.
     '''
     log.info(f'Train a face recognition model on the face DB {path}')
 
     recognizer = FaceRecognizer(log)
-    recognizer.clf.train(path)
+    recognizer.clf.train(path, test_size)
 
     if output is None:
         output = os.path.join(path, 'face_clf.pkl')
