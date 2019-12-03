@@ -32,9 +32,9 @@ class FaceRecognizer:
 
         os.chdir(pwd)
 
-    def recognize(self, images, threshold=None):
+    def recognize(self, images, batch_size=32, threshold=None):
         faces = []
-        face_dets = self.detector.detect(images)
+        face_dets = self.detector.detect(images, batch_size)
 
         for img, dets in zip(images, face_dets):
 
@@ -48,7 +48,7 @@ class FaceRecognizer:
                 chip = self.aligner.align(img, det)
                 face_chips.append(chip)
 
-            face_vecs = self.encoder.encode(face_chips)
+            face_vecs = self.encoder.encode(face_chips, batch_size)
             face_ids = self.clf.predict(face_vecs, threshold, proba=True)
 
             for i, face in enumerate(face_ids):
