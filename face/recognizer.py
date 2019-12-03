@@ -34,25 +34,25 @@ class FaceRecognizer:
 
     def recognize(self, images, threshold=None):
         faces = []
+        face_dets = self.detector.detect(images)
 
-        for i, img in enumerate(images, start=1):
-            face_dets = self.detector.detect(img)
+        for img, dets in zip(images, face_dets):
 
-            if not face_dets:
+            if not len(dets):
                 faces.append([])
                 continue
 
             face_chips = []
 
-            for det in face_dets:
+            for det in dets:
                 chip = self.aligner.align(img, det)
                 face_chips.append(chip)
 
             face_vecs = self.encoder.encode(face_chips)
             face_ids = self.clf.predict(face_vecs, threshold, proba=True)
 
-            for j, face in enumerate(face_ids):
-                face['box'] = self.detector.to_list(face_dets[j].rect)
+            for i, face in enumerate(face_ids):
+                face['box'] = self.detector.to_list(dets[i].rect)
 
             faces.append(face_ids)
 
