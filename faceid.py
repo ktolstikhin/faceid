@@ -30,7 +30,7 @@ def model():
 @model.command()
 @click.option('-p', '--path', required=True, help='A path to a face DB.')
 @click.option('-t', '--test-size', type=float, default=0.2, show_default=True,
-              help='A size of the test part of the training data.')
+              help='A size of a test part of the training data.')
 @click.option('-o', '--output', help='A path to the output model.')
 def train(path, test_size, output):
     '''Train a face recognizer model.

@@ -9,14 +9,19 @@ class Tracker:
 
     TARGET_LOST_FRAMES = 10
 
-    def __init__(self, image_size):
-        self.image_size = image_size
+    def __init__(self, img_size):
+        self.img_size = img_size
         self.targets = {}
         self.lost_frames = {}
 
+    def bound_size(self, bbox):
+        xmin, ymin, xmax, ymax = bbox
+        w, h = self.img_size
+
+        return max(0, xmin), max(0, ymin), min(w, xmax), min(h, ymax)
+
     def add_target(self, bbox):
-        target = Target(bbox, self.image_size)
-        self.targets[target.id] = target
+        self.targets[target.id] = Target(bbox)
         self.lost_frames[target.id] = 0
 
     def remove_target(self, target_id):
@@ -83,9 +88,10 @@ class Tracker:
             if row in used_rows or col in used_cols:
                 continue
 
-            # Update a bounding box coordinates of the tracked target:
+            # Update bounding box coordinates of the tracked target:
             target_id = target_ids[row]
-            self.targets[target_id].update(bbox_list[col])
+            target = self.targets[target_id]
+            target.bbox = self.bound_size(bbox_list[col])
             self.lost_frames[target_id] = 0
 
             used_rows.add(row)
@@ -94,9 +100,9 @@ class Tracker:
         unused_rows = set(range(dist.shape[0])).difference(used_rows)
         unused_cols = set(range(dist.shape[1])).difference(used_cols)
 
-        # If the number of tracked targets is greater than the number of
-        # detected objects, update lost frame counters of absent targets being
-        # tracked. In other case, add new targets to the tracked ones.
+        # If number of tracked targets is greater than the number of detected
+        # objects, update lost frame counters of tracked targets which have not
+        # been found. Otherwise, add new targets to the tracked ones.
         if dist.shape[0] > dist.shape[1]:
             lost_targets = []
 
