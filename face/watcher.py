@@ -1,0 +1,2 @@
+class FaceWatcher:
+    pass
