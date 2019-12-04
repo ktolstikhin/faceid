@@ -12,6 +12,7 @@ clf_model_params = {
     'estimator__verbose': False,
     'n_jobs': -1
 }
+
 clf_thres_min = 0.3
 clf_unknown_face_label = 'Unknown_Face'
 

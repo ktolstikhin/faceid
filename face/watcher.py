@@ -2,6 +2,7 @@ import json
 from threading import Thread, Event
 
 from .vision import VisionTask
+from .tracker import FaceTracker
 from .utils.logger import init_logger
 from .video import VideoDeviceSettings, VideoStream
 
@@ -13,6 +14,7 @@ class FaceWatcher(Thread):
         self.log = log or init_logger('faceid')
         self.stream = self.video_stream(video_conf)
         self.show = show
+        self.tracker = FaceTracker(self.stream.size)
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
 
@@ -47,20 +49,19 @@ class FaceWatcher(Thread):
 
             task.image = frame
             self.task_queue.put(task)
-            faces = task.faces
-            self.log.info(f'Detected {len(faces)} faces')
+            self.tracker.update(task.faces)
+            targets = self.tracker.get_targets()
 
             if self.show:
-                # TODO: track face targets
-                targets = []
                 self.show_targets(frame, targets)
 
     def show_targets(self, frame, targets):
 
         for t in targets:
-            anchor = (t.bbox[0], t.bbox[1] - 5)
-            VideoStream.draw_text(frame, t.label, anchor)
-            VideoStream.draw_box(frame, t.bbox)
+            text = f'{t.label}: {t.proba:.2f}'
+            anchor = (t.box[0], t.box[1] - 5)
+            VideoStream.draw_text(frame, text, anchor)
+            VideoStream.draw_box(frame, t.box)
 
         VideoStream.show(frame, title=self.stream.path)
 

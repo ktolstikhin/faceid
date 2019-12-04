@@ -46,8 +46,8 @@ def run(task_handlers, batch_size, show):
         watcher_num = len(settings.video_conf_files)
         log.info(f'Start {watcher_num} face watcher(s)...')
 
-        for video_conf in settings.video_conf_files:
-            w = FaceWatcher(task_queue, video_conf, show, log)
+        for cfg_file in settings.video_conf_files:
+            w = FaceWatcher(task_queue, cfg_file, show, log)
             w.start()
             watchers.append(w)
 

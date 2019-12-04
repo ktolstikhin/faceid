@@ -10,10 +10,6 @@ class LevelFilter(logging.Filter):
 
 def init_logger(name=None, verbose=False):
     logger = logging.getLogger(name)
-
-    for h in logger.handlers[:]:
-        logger.removeHandler(h)
-
     level = logging.DEBUG if verbose else logging.INFO
     logger.setLevel(level)
 
