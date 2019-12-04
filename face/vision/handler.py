@@ -2,6 +2,7 @@ import queue
 from threading import Thread, Event
 
 from ..utils.logger import init_logger
+from ..recognizer import FaceRecognizer
 
 
 class VisionTaskHandler(Thread):
@@ -14,7 +15,7 @@ class VisionTaskHandler(Thread):
         self.log = log or init_logger('faceid')
         self.recognizer = FaceRecognizer(self.log)
         self.join_event = Event()
-        super().__init__()
+        super().__init__(name='VisionTaskHandler')
 
     def run(self):
         self.log.info('Start handling vision tasks...')
@@ -43,7 +44,7 @@ class VisionTaskHandler(Thread):
                 self.task_queue.task_done()
 
     def join(self, timeout=None):
-        self.log.info('Received a stop signal. Shutting down...')
+        self.log.info(f'Stopping {self.name} thread...')
         self.task_queue.join()
         self.join_event.set()
         super().join(timeout)

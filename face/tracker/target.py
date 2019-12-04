@@ -8,6 +8,7 @@ class Target:
         self._bbox = bbox
         self.lock = Lock()
         self.id = uuid.uuid4().hex
+        self.label = None
 
     @property
     def bbox(self):

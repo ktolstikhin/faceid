@@ -1,8 +1,8 @@
 {
   "path": "/dev/video0",
   "resolution": [
-    2592,
-    1944
+    1024,
+    768
   ],
   "settings": [
     {
