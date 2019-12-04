@@ -49,8 +49,13 @@ class FaceClassifier:
         X, y = self.get_faces(face_db)
         self.log.info('Split data, fit and score a model...')
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size)
+        try:
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=test_size, stratify=True)
+        except TypeError:
+            self.log.warning('Stratified split failed, use a regular one.')
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=test_size)
 
         self.log.info(f'Data: train {X_train.shape}, test {X_test.shape}')
         self.model.fit(X_train, y_train)
