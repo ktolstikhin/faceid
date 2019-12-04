@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd $(dirname $(dirname $(realpath $0)))
-model_path=models
+model_path=${1:-models}
 
 if [ ! -e $model_path ]; then
     mkdir $model_path
