@@ -3,7 +3,7 @@ from threading import Condition
 
 class VisionTask:
 
-    def __init__(self, image):
+    def __init__(self, image=None):
         self.image = image
         self.done = Condition()
         self._faces = None
