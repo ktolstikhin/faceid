@@ -9,13 +9,10 @@ from sklearn.metrics import matthews_corrcoef, classification_report
 
 from .model.builder import build_model
 from .utils.logger import init_logger
+from . import settings
 
 
 class FaceClassifier:
-
-    THRES_MIN = 0.3
-    MODEL_PARAMS = None
-    UNKNOWN_FACE_LABEL = 'Unknown_Face'
 
     def __init__(self, model_path=None, log=None):
         self.log = log or init_logger('faceid')
@@ -73,7 +70,7 @@ class FaceClassifier:
         self.log.info(f'Done. Best threshold: {self.model.threshold:.2f}')
 
     def find_best_threshold(self, probas, y_true):
-        thresholds = np.arange(self.THRES_MIN, 1.0, 0.01)[::-1]
+        thresholds = np.arange(settings.clf_thres_min, 1.0, 0.01)[::-1]
         corrs = []
 
         for thres in thresholds:
@@ -91,7 +88,7 @@ class FaceClassifier:
 
         max_probas = np.max(probas, axis=1)
         thres = threshold or self.model.threshold
-        labels[max_probas < thres] = self.UNKNOWN_FACE_LABEL
+        labels[max_probas < thres] = settings.clf_unknown_face_label
 
         return labels
 
@@ -128,7 +125,7 @@ class FaceClassifier:
 
             self.log.warning('Build a new face recognizer model...')
 
-            return build_model(self.MODEL_PARAMS)
+            return build_model(settings.clf_model_params)
 
         self.log.info(f'Load a face recognizer model from {path}')
 

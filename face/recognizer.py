@@ -6,23 +6,20 @@ from .encoder import FaceEncoder
 from .detector import FaceDetector
 from .classifier import FaceClassifier
 from .utils.logger import init_logger
+from . import settings
 
 
 class FaceRecognizer:
-
-    CONF_DIR = 'cfg'
-    MODEL_CONF_FILE = 'models.json'
 
     def __init__(self, log=None):
         self.log = log or init_logger('faceid')
         self.load_models()
 
     def load_models(self):
-        cfg_dir = os.path.join(os.path.dirname(__file__), self.CONF_DIR)
         pwd = os.getcwd()
-        os.chdir(cfg_dir)
+        os.chdir(settings.model_conf_file.parent)
 
-        with open(self.MODEL_CONF_FILE) as f:
+        with open(settings.model_conf_file) as f:
             cfg = json.load(f)
 
         self.aligner = FaceAligner(cfg['face_shape_predictor'], self.log)
