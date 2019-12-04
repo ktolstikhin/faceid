@@ -27,7 +27,7 @@ class FaceWatcher(Thread):
         s = cfg.get('settings')
 
         if s is not None:
-            self.log.info(f'Apply video stream settings...')
+            self.log.info('Apply video stream settings...')
             vds = VideoDeviceSettings(path)
             vds.exposure_manual()
             vds.set(s)

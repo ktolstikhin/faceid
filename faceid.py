@@ -2,12 +2,15 @@
 import os
 import sys
 import json
+import time
 
 import click
 import numpy as np
+from queue import Queue
 from PIL import Image, ImageFile
 
-from face import FaceRecognizer
+from face import FaceWatcher, FaceRecognizer, settings
+from face.vision import VisionTaskHandler
 from face.utils.logger import init_logger
 
 
@@ -19,6 +22,48 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 def faceid():
     '''The application CLI.
     '''
+
+
+@faceid.command()
+@click.option('-t', '--task-handlers', type=int, default=1, show_default=True,
+              help='A number of vision task handler threads.')
+@click.option('-b', '--batch-size', type=int, default=32, show_default=True,
+              help='A size of vision task batches.')
+@click.option('-s', '--show', is_flag=True, help='Show tracked faces.')
+def run(task_handlers, batch_size, show):
+    '''Start watching faces.
+    '''
+    try:
+        task_queue = Queue()
+        handlers, watchers = [], []
+        log.info(f'Start {task_handlers} vision task handler(s)...')
+
+        for _ in range(task_handlers):
+            h = VisionTaskHandler(task_queue, batch_size, log)
+            h.start()
+            handlers.append(h)
+
+        watcher_num = len(settings.video_conf_files)
+        log.info(f'Start {watcher_num} face watcher(s)...')
+
+        for video_conf in settings.video_conf_files:
+            w = FaceWatcher(task_queue, video_conf, show, log)
+            w.start()
+            watchers.append(w)
+
+        while True:
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # First, stop watchers, then stop handlers. The order does matter.
+
+        for w in watchers:
+            w.join()
+
+        for h in handlers:
+            h.join()
 
 
 @faceid.group()
