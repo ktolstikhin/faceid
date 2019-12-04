@@ -1,11 +1,11 @@
 import numpy as np
 from scipy.spatial import distance
 
-from .target import Target
+from .target import FaceTarget
 from .utils import box_center
 
 
-class Tracker:
+class FaceTracker:
 
     TARGET_LOST_FRAMES = 10
 
@@ -14,14 +14,15 @@ class Tracker:
         self.targets = {}
         self.lost_frames = {}
 
-    def bound_size(self, bbox):
-        xmin, ymin, xmax, ymax = bbox
+    def bound_size(self, box):
+        xmin, ymin, xmax, ymax = box
         w, h = self.img_size
 
         return max(0, xmin), max(0, ymin), min(w, xmax), min(h, ymax)
 
-    def add_target(self, bbox):
-        self.targets[target.id] = Target(bbox)
+    def add_target(self, face):
+        target = FaceTarget(face['label'], face['proba'], face['box'])
+        self.targets[target.id] = target
         self.lost_frames[target.id] = 0
 
     def remove_target(self, target_id):
@@ -31,12 +32,12 @@ class Tracker:
     def get_targets(self):
         return list(self.targets.values())
 
-    def update(self, bbox_list):
-        # If the input list of detected objects is empty, increment lost frame
+    def update(self, faces):
+        # If the input list of detected faces is empty, increment lost frame
         # counter for all of the tracked targets. If number of frames without a
         # tracked target has exceeded a certain threshold, remove this target
         # from the tracked ones.
-        if not bbox_list:
+        if not faces:
             lost_targets = []
 
             for target_id in self.targets:
@@ -50,17 +51,17 @@ class Tracker:
 
             return self
 
-        # If there are no tracked targets, add all the detected objects to the
+        # If there are no tracked targets, add all the detected faces to the
         # tracked targets.
         if not self.targets:
 
-            for bbox in bbox_list:
-                self.add_target(bbox)
+            for face in faces:
+                self.add_target(face)
 
             return self
 
         # Perform a match between centroids of bounding boxes of the detected
-        # objects and tracked targets based on the euclidean distance between
+        # faces and tracked targets based on the euclidean distance between
         # them.
         target_ids, target_centroids = [], []
 
@@ -68,16 +69,14 @@ class Tracker:
             target_ids.append(tid)
             target_centroids.append(target.center)
 
-        input_centroids = [box_center(bbox) for bbox in bbox_list]
-
         target_centroids = np.array(target_centroids)
+        input_centroids = [box_center(face['box']) for face in faces]
         input_centroids = np.array(input_centroids)
 
         dist = distance.cdist(target_centroids, input_centroids)
 
         # Sort distances between centroids. Here, "rows" is index array of
-        # tracked targets, and "cols" is index array of closest detected
-        # objects.
+        # tracked targets, and "cols" is index array of closest detected faces.
         rows = dist.min(axis=1).argsort()
         cols = dist.argmin(axis=1)[rows]
 
@@ -91,7 +90,7 @@ class Tracker:
             # Update bounding box coordinates of the tracked target:
             target_id = target_ids[row]
             target = self.targets[target_id]
-            target.bbox = self.bound_size(bbox_list[col])
+            target.box = self.bound_size(faces[col]['box'])
             self.lost_frames[target_id] = 0
 
             used_rows.add(row)
@@ -101,7 +100,7 @@ class Tracker:
         unused_cols = set(range(dist.shape[1])).difference(used_cols)
 
         # If number of tracked targets is greater than the number of detected
-        # objects, update lost frame counters of tracked targets which have not
+        # faces, update lost frame counters of tracked targets which have not
         # been found. Otherwise, add new targets to the tracked ones.
         if dist.shape[0] > dist.shape[1]:
             lost_targets = []
@@ -119,7 +118,7 @@ class Tracker:
         else:
 
             for col in unused_cols:
-                self.add_target(bbox_list[col])
+                self.add_target(faces[col])
 
         return self
 

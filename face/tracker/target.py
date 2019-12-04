@@ -1,24 +1,11 @@
 import uuid
-from threading import Lock
 
 
-class Target:
+class FaceTarget:
 
-    def __init__(self, bbox):
-        self._bbox = bbox
-        self.lock = Lock()
+    def __init__(self, label, proba, box):
+        self.label = label
+        self.proba = proba
+        self.box = box
         self.id = uuid.uuid4().hex
-        self.label = None
-
-    @property
-    def bbox(self):
-
-        with self.lock:
-            return self._bbox
-
-    @bbox.setter
-    def bbox(self, val):
-
-        with self.lock:
-            self._bbox = val
 
