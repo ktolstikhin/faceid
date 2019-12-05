@@ -69,7 +69,8 @@ def run(task_handlers, batch_size, show):
 
 
 @faceid.command()
-def init():
+@click.option('-r', '--reset', is_flag=True, help='Reset to defaults.')
+def init(reset):
     '''Initialize video devices.
     '''
 
@@ -79,7 +80,7 @@ def init():
             cfg = json.load(f)
 
         log.info(f'Initialize video device {cfg["path"]}')
-        apply_device_settings(cfg)
+        apply_device_settings(cfg, reset)
 
 
 @faceid.group()

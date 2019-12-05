@@ -18,11 +18,15 @@ def create_stream(conf_file, configure=False):
     return VideoStream(path, size)
 
 
-def apply_device_settings(cfg):
+def apply_device_settings(cfg, reset=False):
     s = cfg.get('settings')
 
     if s is not None:
         vds = VideoDeviceSettings(cfg['path'])
-        vds.exposure_manual()
-        vds.set(s)
+
+        if reset:
+            vds.reset_to_defaults()
+        else:
+            vds.exposure_manual()
+            vds.set(s)
 
