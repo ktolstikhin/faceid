@@ -43,10 +43,7 @@ class FaceClassifier:
         return np.array(vecs), np.array(names)
 
     def train(self, face_db, test_size=0.2, optimize_params=False):
-        self.log.warning('Build a new model...')
-        self.model = builder.build_model(settings.clf_model_params)
-
-        self.log.info('Split data, then fit and score the model...')
+        self.log.info('Split data, then fit and score the face model...')
         X, y = self.get_faces(face_db)
 
         try:
@@ -82,7 +79,7 @@ class FaceClassifier:
         self.log.info(f'Done. Best threshold: {self.model.threshold:.2f}')
 
     def find_best_threshold(self, probas, y_true):
-        thresholds = np.arange(settings.clf_thres_min, 1.0, 0.01)
+        thresholds = np.arange(settings.clf_min_thres, 1.0, 0.01)
         corrs = []
 
         for thres in thresholds:
@@ -97,7 +94,6 @@ class FaceClassifier:
     def proba_to_label(self, probas, threshold=None):
         indices = np.argmax(probas, axis=1)
         labels = self.model.classes_.take(indices)
-
         max_probas = np.max(probas, axis=1)
         thres = threshold or self.model.threshold
         labels[max_probas < thres] = settings.clf_unknown_face_label
@@ -130,16 +126,12 @@ class FaceClassifier:
 
     def load(self, path=None):
 
-        if path is None or not os.path.exists(path):
+        if path is None:
+            self.log.info('Build a new face recognizer model...')
+            model = builder.build_model(settings.clf_model_params)
+        else:
+            self.log.info(f'Load a face recognizer model from {path}')
+            model = joblib.load(path)
 
-            if path and not os.path.exists(path):
-                self.log.warning(f'File not found: {path}')
-
-            self.log.warning('Build a new face recognizer model...')
-
-            return builder.build_model(settings.clf_model_params)
-
-        self.log.info(f'Load a face recognizer model from {path}')
-
-        return joblib.load(path)
+        return model
 

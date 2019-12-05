@@ -9,7 +9,7 @@ import numpy as np
 from queue import Queue
 from PIL import Image, ImageFile
 
-from face import FaceWatcher, FaceRecognizer, settings
+from face import FaceClassifier, FaceRecognizer, FaceWatcher, settings
 from face.vision import VisionTaskHandler
 from face.utils.logger import init_logger
 
@@ -83,25 +83,24 @@ def train(path, test_size, output, optimize):
     '''
     log.info(f'Train a face recognition model on the face DB {path}')
 
-    recognizer = FaceRecognizer(log)
-    recognizer.clf.train(path, test_size, optimize)
+    clf = FaceClassifier(log=log)
+    clf.train(path, test_size, optimize)
 
     if output is None:
         output = os.path.join(path, 'face_clf.pkl')
 
-    recognizer.clf.save(output)
-
+    clf.save(output)
     model_file = os.path.splitext(output)[0]
     score_file = f'{model_file}.json'
 
     with open(score_file, 'w') as f:
-        score_json = json.dumps(recognizer.clf.model.score, indent=2)
+        score_json = json.dumps(clf.model.score, indent=2)
         f.write(score_json)
 
 
 @model.command()
 @click.option('-p', '--path', required=True, help='A path to a test face DB.')
-@click.option('-o', '--output', help='A path to output test metrics (JSON).')
+@click.option('-o', '--output', help='A path to output test metrics (json).')
 def test(path, output):
     '''Test a face recognizer model.
     '''
@@ -114,6 +113,7 @@ def test(path, output):
     log.info(f'Done. Test score:\n{score_json}')
 
     if output is not None:
+        log.info(f'Save test metrics to {output}')
 
         with open(output, 'w') as f:
             score_json = json.dumps(score, indent=2)
