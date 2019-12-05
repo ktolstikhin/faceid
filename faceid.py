@@ -55,13 +55,15 @@ def run(task_handlers, batch_size, show):
         while True:
             n_watchers = sum(1 for w in watchers if w.is_alive())
             n_handlers = sum(1 for h in handlers if h.is_alive())
-            log.info(f'Running: {n_watchers} watcher(s), {n_handlers} handler(s)...')
+            log.info(f'Running: {n_watchers} watchers, '
+                              f'{n_handlers} handlers...')
             time.sleep(5)
 
     except KeyboardInterrupt:
         pass
     finally:
-        # First, join watcher threads, then handler threads. The order does matter.
+        # First, join watcher threads, then handler threads. The order does
+        # matter.
         threads = watchers + handlers
 
         for t in threads:
@@ -69,7 +71,8 @@ def run(task_handlers, batch_size, show):
 
 
 @faceid.command()
-@click.option('-r', '--reset', is_flag=True, help='Reset to defaults.')
+@click.option('-r', '--reset', is_flag=True,
+              help='Reset to default setttings.')
 def init(reset):
     '''Initialize video devices.
     '''
@@ -90,21 +93,21 @@ def model():
 
 
 @model.command()
-@click.option('-p', '--path', required=True, help='A path to a face DB.')
+@click.option('-f', '--facedb', required=True, help='A path to the face DB.')
 @click.option('-t', '--test-size', type=float, default=0.2, show_default=True,
               help='A size of a test part of the training data.')
 @click.option('-o', '--output', help='A path to the output model.')
 @click.option('--optimize', is_flag=True, help='Optimize model parameters.')
-def train(path, test_size, output, optimize):
+def train(facedb, test_size, output, optimize):
     '''Train a face recognizer model.
     '''
-    log.info(f'Train a face recognition model on the face DB {path}')
+    log.info(f'Train a face recognition model on the face DB {facedb}')
 
     clf = FaceClassifier(log=log)
-    clf.train(path, test_size, optimize)
+    clf.train(facedb, test_size, optimize)
 
     if output is None:
-        output = os.path.join(path, 'face_clf.pkl')
+        output = os.path.join(facedb, 'face_clf.pkl')
 
     clf.save(output)
     model_file = os.path.splitext(output)[0]
@@ -116,15 +119,15 @@ def train(path, test_size, output, optimize):
 
 
 @model.command()
-@click.option('-p', '--path', required=True, help='A path to a test face DB.')
+@click.option('-f', '--facedb', required=True, help='A path to the face DB.')
 @click.option('-o', '--output', help='A path to output test metrics (json).')
-def test(path, output):
+def test(facedb, output):
     '''Test a face recognizer model.
     '''
-    log.info(f'Test a face recognition model on the face DB {path}')
+    log.info(f'Test a face recognition model on the face DB {facedb}')
 
     recognizer = FaceRecognizer(log)
-    score = recognizer.clf.test(path)
+    score = recognizer.clf.test(facedb)
 
     score_json = json.dumps(score['macro avg'], indent=2)
     log.info(f'Done. Test score:\n{score_json}')
@@ -144,19 +147,18 @@ def db():
 
 
 @db.command()
-@click.option('-p', '--path', required=True, help='A path to a face DB.')
-@click.option('-f', '--force', is_flag=True,
-              help='Force encoding all found images.')
-def init(path, force):
+@click.option('-f', '--facedb', required=True, help='A path to the face DB.')
+@click.option('--force', is_flag=True, help='Force encoding all found images.')
+def init(facedb, force):
     '''Initialize a face DB.
     '''
     recognizer = FaceRecognizer(log)
 
-    input_files = [os.path.join(path, f) for f in os.listdir(path)]
+    input_files = [os.path.join(facedb, f) for f in os.listdir(facedb)]
     dirnames = [f for f in input_files if os.path.isdir(f)]
     n = len(dirnames)
 
-    log.info(f'Inspecting the face DB {path}')
+    log.info(f'Inspecting the face DB {facedb}')
     images = []
 
     for i, dirname in enumerate(dirnames, start=1):
