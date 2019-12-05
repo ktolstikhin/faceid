@@ -29,7 +29,7 @@ def faceid():
 @click.option('-t', '--task-handlers', type=int, default=1, show_default=True,
               help='A number of vision task handler threads.')
 @click.option('-b', '--batch-size', type=int, default=32, show_default=True,
-              help='A size of vision task batches.')
+              help='A size of a vision task batch.')
 @click.option('-s', '--show', is_flag=True, help='Show tracked faces.')
 def run(task_handlers, batch_size, show):
     '''Start watching faces.
@@ -53,7 +53,10 @@ def run(task_handlers, batch_size, show):
             watchers.append(w)
 
         while True:
-            time.sleep(1)
+            n_watchers = sum(1 for w in watchers if w.is_alive())
+            n_handlers = sum(1 for h in handlers if h.is_alive())
+            log.info(f'Running: {n_watchers} watchers, {n_handlers} handlers...')
+            time.sleep(5)
 
     except KeyboardInterrupt:
         pass
