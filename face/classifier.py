@@ -43,8 +43,10 @@ class FaceClassifier:
         return np.array(vecs), np.array(names)
 
     def train(self, face_db, test_size=0.2):
-        self.log.info('Split data, then build, fit, and score a new model...')
+        self.log.warning('Build a new model...')
         self.model = build_model(settings.clf_model_params)
+
+        self.log.info('Split data, then fit and score the model...')
         X, y = self.get_faces(face_db)
 
         try:
