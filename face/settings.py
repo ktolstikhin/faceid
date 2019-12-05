@@ -6,10 +6,8 @@ model_conf_file = root.joinpath('models.json')
 video_conf_files = list(root.joinpath('video').glob('*.json'))
 
 clf_model_params = {
-    'estimator__gamma': 'auto',
-    'estimator__kernel': 'rbf',
-    'estimator__probability': True,
-    'estimator__verbose': False,
+    'n_neighbors': 5,
+    'algorithm': 'kd_tree',
     'n_jobs': -1
 }
 
