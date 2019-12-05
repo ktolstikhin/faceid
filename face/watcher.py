@@ -1,40 +1,23 @@
-import json
 from threading import Thread, Event
 
 from .vision import VisionTask
 from .tracker import FaceTracker
 from .utils.logger import init_logger
-from .video import VideoDeviceSettings, VideoStream
+from .video.utils import create_stream
+from .video.stream import VideoStream
 
 
 class FaceWatcher(Thread):
 
     def __init__(self, task_queue, video_conf, show=False, log=None):
         self.task_queue = task_queue
+        self.stream = create_stream(video_conf)
         self.log = log or init_logger('faceid')
-        self.stream = self.video_stream(video_conf)
+        self.log.info(f'Start video stream from {self.stream.path}')
         self.show = show
         self.tracker = FaceTracker(self.stream.size)
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
-
-    def video_stream(self, conf_file):
-
-        with open(conf_file) as f:
-            cfg = json.load(f)
-
-        path, size = cfg['path'], tuple(cfg['resolution'])
-        self.log.info(f'Initialize video stream {path}')
-        stream = VideoStream(path, size)
-        s = cfg.get('settings')
-
-        if s is not None:
-            self.log.info('Apply video stream settings...')
-            vds = VideoDeviceSettings(path)
-            vds.exposure_manual()
-            vds.set(s)
-
-        return stream
 
     def run(self):
         self.log.info('Start watching faces...')

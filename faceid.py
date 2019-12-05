@@ -10,6 +10,7 @@ from queue import Queue
 from PIL import Image, ImageFile
 
 from face import FaceClassifier, FaceRecognizer, FaceWatcher, settings
+from face.video.utils import apply_device_settings
 from face.vision import VisionTaskHandler
 from face.utils.logger import init_logger
 
@@ -64,6 +65,20 @@ def run(task_handlers, batch_size, show):
 
         for h in handlers:
             h.join()
+
+
+@faceid.command()
+def init():
+    '''Initialize video devices.
+    '''
+
+    for cfg_file in settings.video_conf_files:
+
+        with open(cfg_file) as f:
+            cfg = json.load(f)
+
+        log.info(f'Initialize video device {cfg["path"]}')
+        apply_device_settings(cfg)
 
 
 @faceid.group()
