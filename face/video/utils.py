@@ -9,11 +9,11 @@ def create_stream(conf_file, configure=False):
     with open(conf_file) as f:
         cfg = json.load(f)
 
-    path = cfg['path']
-    size = tuple(cfg['resolution'])
-
     if configure:
         apply_device_settings(cfg)
+
+    path = cfg['path']
+    size = tuple(cfg['resolution'])
 
     return VideoStream(path, size)
 

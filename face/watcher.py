@@ -41,7 +41,7 @@ class FaceWatcher(Thread):
     def show_targets(self, frame, targets):
 
         for t in targets:
-            text = f'{t.label}: {t.proba:.2f}'
+            text = f'{t.label}: {t.proba:.2f}\nID: {t.id}'
             anchor = (t.box[0], t.box[1] - 5)
             VideoStream.draw_text(frame, text, anchor)
             VideoStream.draw_box(frame, t.box)

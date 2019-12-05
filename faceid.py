@@ -55,19 +55,17 @@ def run(task_handlers, batch_size, show):
         while True:
             n_watchers = sum(1 for w in watchers if w.is_alive())
             n_handlers = sum(1 for h in handlers if h.is_alive())
-            log.info(f'Running: {n_watchers} watchers, {n_handlers} handlers...')
+            log.info(f'Running: {n_watchers} watcher(s), {n_handlers} handler(s)...')
             time.sleep(5)
 
     except KeyboardInterrupt:
         pass
     finally:
-        # First, stop watchers, then stop handlers. The order does matter.
+        # First, join watcher threads, then handler threads. The order does matter.
+        threads = watchers + handlers
 
-        for w in watchers:
-            w.join()
-
-        for h in handlers:
-            h.join()
+        for t in threads:
+            t.join()
 
 
 @faceid.command()
@@ -220,5 +218,10 @@ def init(path, force):
 
 
 if __name__ == '__main__':
-    faceid()
+
+    try:
+        faceid()
+    except RuntimeError as e:
+        log.error(e)
+        sys.exit(1)
 
