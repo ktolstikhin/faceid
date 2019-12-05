@@ -43,8 +43,9 @@ class FaceClassifier:
         return np.array(vecs), np.array(names)
 
     def train(self, face_db, test_size=0.2):
+        self.log.info('Split data, then build, fit, and score a new model...')
+        self.model = build_model(settings.clf_model_params)
         X, y = self.get_faces(face_db)
-        self.log.info('Split data, fit and score a model...')
 
         try:
             X_train, X_test, y_train, y_test = train_test_split(
@@ -70,7 +71,7 @@ class FaceClassifier:
         self.log.info(f'Done. Best threshold: {self.model.threshold:.2f}')
 
     def find_best_threshold(self, probas, y_true):
-        thresholds = np.arange(settings.clf_thres_min, 1.0, 0.01)[::-1]
+        thresholds = np.arange(settings.clf_thres_min, 1.0, 0.01)
         corrs = []
 
         for thres in thresholds:
