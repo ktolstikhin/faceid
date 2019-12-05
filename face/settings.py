@@ -11,6 +11,12 @@ clf_model_params = {
     'n_jobs': -1
 }
 
+clf_model_param_grid = {
+    'n_neighbors': range(1, 5),
+    'weights': ('uniform', 'distance'),
+    'algorithm': ('ball_tree', 'kd_tree'),
+}
+
 clf_thres_min = 0.3
 clf_unknown_face_label = 'Unknown_Face'
 

@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import matthews_corrcoef, classification_report
 
-from .model.builder import build_model
+from .model import builder, optimizer
 from .utils.logger import init_logger
 from . import settings
 
@@ -42,9 +42,9 @@ class FaceClassifier:
 
         return np.array(vecs), np.array(names)
 
-    def train(self, face_db, test_size=0.2):
+    def train(self, face_db, test_size=0.2, optimize_params=False):
         self.log.warning('Build a new model...')
-        self.model = build_model(settings.clf_model_params)
+        self.model = builder.build_model(settings.clf_model_params)
 
         self.log.info('Split data, then fit and score the model...')
         X, y = self.get_faces(face_db)
@@ -58,12 +58,21 @@ class FaceClassifier:
                 X, y, test_size=test_size)
 
         self.log.info(f'Data: train {X_train.shape}, test {X_test.shape}')
+
+        if optimize_params:
+            self.log.info('Start optimization of model parameters...')
+            params = optimizer.optimize(
+                self.model, X, y, settings.clf_model_param_grid)
+            self.log.info(f'Best params: {params}')
+            params.update({'n_jobs': -1})
+            self.model.set_params(**params)
+
         self.model.fit(X_train, y_train)
         y_pred = self.model.predict(X_test)
         self.model.score = self.score(y_test, y_pred)
 
         score_json = json.dumps(self.model.score['macro avg'], indent=2)
-        self.log.info(f'Done. Test score:\n{score_json}')
+        self.log.info(f'Test model score:\n{score_json}')
         self.log.info('Train a final model...')
 
         probas = self.model.predict_proba(X_test)
@@ -128,7 +137,7 @@ class FaceClassifier:
 
             self.log.warning('Build a new face recognizer model...')
 
-            return build_model(settings.clf_model_params)
+            return builder.build_model(settings.clf_model_params)
 
         self.log.info(f'Load a face recognizer model from {path}')
 

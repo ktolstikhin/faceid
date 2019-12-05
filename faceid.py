@@ -77,13 +77,14 @@ def model():
 @click.option('-t', '--test-size', type=float, default=0.2, show_default=True,
               help='A size of a test part of the training data.')
 @click.option('-o', '--output', help='A path to the output model.')
-def train(path, test_size, output):
+@click.option('--optimize', is_flag=True, help='Optimize model parameters.')
+def train(path, test_size, output, optimize):
     '''Train a face recognizer model.
     '''
     log.info(f'Train a face recognition model on the face DB {path}')
 
     recognizer = FaceRecognizer(log)
-    recognizer.clf.train(path, test_size)
+    recognizer.clf.train(path, test_size, optimize)
 
     if output is None:
         output = os.path.join(path, 'face_clf.pkl')
