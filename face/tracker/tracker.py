@@ -24,9 +24,14 @@ class FaceTracker:
 
     def update_target(self, target_id, face):
         target = self.targets[target_id]
-        target.label = face['label']
-        target.proba = face['proba']
-        target.box = self.bound_size(face['box'])
+
+        if target.label != face['label']:
+            self.target_keeper.remove(target)
+            target.label = face['label']
+            target.proba = face['proba']
+            target.box = self.bound_size(face['box'])
+            self.target_keeper.add(target)
+
         self.lost_frames[target_id] = 0
 
     def add_target(self, face):
