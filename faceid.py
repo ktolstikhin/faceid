@@ -3,11 +3,11 @@ import os
 import sys
 import json
 import time
+from queue import Queue
 
 import click
 import numpy as np
-from queue import Queue
-from PIL import Image, ImageFile
+from PIL import Image
 
 from face import settings
 from face.watcher import FaceWatcher
@@ -21,7 +21,6 @@ from face.video.utils import create_stream, apply_device_settings
 
 
 log = init_logger('faceid')
-ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 @click.group()

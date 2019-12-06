@@ -1,9 +1,13 @@
 from pathlib import Path
 
+from PIL import ImageFile
+
 
 root = Path(__file__).parent.joinpath('cfg')
 model_conf_file = root.joinpath('models.json')
 video_conf_files = list(root.joinpath('video').glob('*.json'))
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Default parameters for face model:
 clf_model_params = {
