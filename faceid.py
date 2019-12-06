@@ -78,15 +78,20 @@ def run(task_handlers, batch_size, show):
     except KeyboardInterrupt:
         pass
     finally:
-        # First, join watcher threads, then handler threads. The order does
-        # matter.
+        # First, join watchers, then handlers. The order does matter.
         threads = watchers + handlers
 
         for t in threads:
             t.join()
 
 
-@faceid.command()
+@faceid.group()
+def video():
+    '''Manage video devices.
+    '''
+
+
+@video.command()
 @click.option('-r', '--reset', is_flag=True,
               help='Reset to default setttings.')
 def init(reset):
