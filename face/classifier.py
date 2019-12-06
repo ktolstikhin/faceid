@@ -43,27 +43,19 @@ class FaceClassifier:
         return np.array(vecs), np.array(names)
 
     def train(self, face_db, test_size=0.2, optimize_params=False):
-        self.log.info('Split data, then fit and score the face model...')
         X, y = self.get_faces(face_db)
-
-        try:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size, stratify=True)
-        except TypeError:
-            self.log.warning('Stratified split failed, use a regular one.')
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size)
-
+        split = train_test_split(X, y, test_size=test_size)
+        X_train, X_test, y_train, y_test = split
         self.log.info(f'Data: train {X_train.shape}, test {X_test.shape}')
 
         if optimize_params:
             self.log.info('Start optimization of model parameters...')
             params = optimizer.optimize(
-                self.model, X, y, settings.clf_model_param_grid)
+                self.model, X_train, y_train, settings.clf_model_param_grid)
             self.log.info(f'Best params: {params}')
-            params.update({'n_jobs': -1})
             self.model.set_params(**params)
 
+        self.log.info('Train a face recoginzer model...')
         self.model.fit(X_train, y_train)
         y_pred = self.model.predict(X_test)
         self.model.score = self.score(y_test, y_pred)
@@ -74,8 +66,8 @@ class FaceClassifier:
 
         probas = self.model.predict_proba(X_test)
         self.model.threshold = self.find_best_threshold(probas, y_test)
-
         self.model.fit(X, y)
+
         self.log.info(f'Done. Best threshold: {self.model.threshold:.2f}')
 
     def find_best_threshold(self, probas, y_true):
