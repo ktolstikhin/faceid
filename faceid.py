@@ -16,8 +16,8 @@ from face.recognizer import FaceRecognizer
 from face.utils.logger import init_logger
 from face.tracker import FaceTargetKeeper
 from face.vision import VisionTaskHandler
-from face.video.utils import apply_device_settings
 from face.video.frame import FrameBuffer
+from face.video.utils import create_stream, apply_device_settings
 
 
 log = init_logger('faceid')
@@ -52,8 +52,10 @@ def run(task_handlers, batch_size, show):
         watcher_num = len(settings.video_conf_files)
         log.info(f'Start {watcher_num} face watcher(s)...')
 
-        for cfg_file in settings.video_conf_files:
-            w = FaceWatcher(task_queue, cfg_file, show, log)
+        for conf_file in settings.video_conf_files:
+            video_stream = create_stream(conf_file)
+            log.info(f'Start video stream from {video_stream.path}')
+            w = FaceWatcher(task_queue, video_stream, show, log)
             w.start()
             watchers.append(w)
 

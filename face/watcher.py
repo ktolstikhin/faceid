@@ -3,19 +3,17 @@ from threading import Thread, Event
 from .vision import VisionTask
 from .tracker import FaceTracker
 from .video.frame import FrameBuffer
-from .video.utils import create_stream
 from .utils.logger import init_logger
 
 
 class FaceWatcher(Thread):
 
-    def __init__(self, task_queue, video_conf, show=False, log=None):
+    def __init__(self, task_queue, video_stream, show=False, log=None):
         self.task_queue = task_queue
-        self.stream = create_stream(video_conf)
-        self.log = log or init_logger('faceid')
-        self.log.info(f'Start video stream from {self.stream.path}')
+        self.video_stream = video_stream
+        self.tracker = FaceTracker(video_stream.size)
         self.frame_buffer = FrameBuffer() if show else None
-        self.tracker = FaceTracker(self.stream.size)
+        self.log = log or init_logger('faceid')
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
 
@@ -24,10 +22,10 @@ class FaceWatcher(Thread):
         task = VisionTask()
 
         while not self.join_event.is_set():
-            frame = self.stream.read()
+            frame = self.video_stream.read()
 
             if frame is None:
-                self.log.warning(f'Failed to read from {self.stream.path}')
+                self.log.warning(f'Failed to read from {self.video_stream.path}')
                 continue
 
             task.image = frame
@@ -36,7 +34,7 @@ class FaceWatcher(Thread):
             targets = self.tracker.get_targets()
 
             if self.frame_buffer is not None:
-                self.frame_buffer.add(frame, targets, self.stream.path)
+                self.frame_buffer.add(frame, targets, self.video_stream.path)
 
     def join(self, timeout=None):
         self.log.info(f'Stopping {self.name} thread...')
