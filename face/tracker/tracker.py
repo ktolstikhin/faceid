@@ -12,6 +12,7 @@ class FaceTracker:
 
     def __init__(self, img_size):
         self.img_size = img_size
+        self.target_keeper = FaceTargetKeeper()
         self.targets = {}
         self.lost_frames = {}
 
@@ -23,12 +24,12 @@ class FaceTracker:
 
     def add_target(self, face):
         target = FaceTarget(face['label'], face['proba'], face['box'])
-        FaceTargetKeeper.add(target)
+        self.target_keeper.add(target)
         self.targets[target.id] = target
         self.lost_frames[target.id] = 0
 
     def remove_target(self, target_id):
-        FaceTargetKeeper.remove(target)
+        self.target_keeper.remove(target)
         del self.targets[target_id]
         del self.lost_frames[target_id]
 

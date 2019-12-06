@@ -1,3 +1,4 @@
+from copy import copy
 from threading import Lock
 from collections import defaultdict
 
@@ -8,15 +9,13 @@ class FaceTargetKeeper:
     _faces = defaultdict(dict)
     _lock = Lock()
 
-    @staticmethod
-    def add(target):
+    def add(self, target):
 
         with self._lock:
             self._targets[target.id] = target
             self._faces[target.label][target.id] = target
 
-    @staticmethod
-    def remove(target):
+    def remove(self, target):
 
         with self._lock:
 
@@ -26,16 +25,15 @@ class FaceTargetKeeper:
             except KeyError:
                 pass
 
-    @staticmethod
-    def get(label=None, target_id=None):
+    def get(self, label=None, target_id=None):
 
         with self._lock:
 
             if label is None and target_id is None:
-                return self._faces
+                return {l: copy(d) for l, d in self._faces.items()}
 
             if target_id is None:
-                return self._faces.get(label)
+                return copy(self._faces.get(label))
             else:
                 return self._targets.get(target_id)
 

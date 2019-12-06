@@ -53,8 +53,10 @@ def run(task_handlers, batch_size, show):
             w.start()
             watchers.append(w)
 
+        target_keeper = FaceTargetKeeper()
+
         while True:
-            tracked = FaceTargetKeeper.get()
+            tracked = target_keeper.get()
             faces = {label: len(targets) for label, targes in tracked.items()}
             faces = ', '.join(f'{num} {lab}' for lab, num in faces.items())
             log.info(f'Tracking: {faces}')
