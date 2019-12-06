@@ -29,12 +29,13 @@ class FaceTracker:
         self.lost_frames[target.id] = 0
 
     def remove_target(self, target_id):
+        target = self.targets[target_id]
         self.target_keeper.remove(target)
         del self.targets[target_id]
         del self.lost_frames[target_id]
 
     def get_targets(self):
-        return list(self.targets.values())
+        return self.targets.values()
 
     def update(self, faces):
         # If the input list of detected faces is empty, increment lost frame
@@ -71,7 +72,8 @@ class FaceTracker:
 
         for tid, target in self.targets.items():
             target_ids.append(tid)
-            target_centroids.append(target.center)
+            center = box_center(target.box)
+            target_centroids.append(center)
 
         target_centroids = np.array(target_centroids)
         input_centroids = [box_center(face['box']) for face in faces]

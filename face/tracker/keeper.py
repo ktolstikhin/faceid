@@ -22,6 +22,10 @@ class FaceTargetKeeper:
             try:
                 del self._targets[target.id]
                 del self._faces[target.label][target.id]
+
+                if not self._faces[target.label]:
+                    del self._faces[target.label]
+
             except KeyError:
                 pass
 

@@ -47,7 +47,7 @@ class VideoStream:
             anchor = (5, height - 5)
 
         cv2.putText(frame, text, anchor, cv2.FONT_HERSHEY_SIMPLEX,
-                    scale=1, color=color, thickness=1)
+                    fontScale=1, color=color, thickness=2)
 
     @staticmethod
     def show(frame, title=None, size=None):
