@@ -22,6 +22,13 @@ class FaceTracker:
 
         return max(0, xmin), max(0, ymin), min(w, xmax), min(h, ymax)
 
+    def update_target(self, target_id, face):
+        target = self.targets[target_id]
+        target.label = face['label']
+        target.proba = face['proba']
+        target.box = self.bound_size(face['box'])
+        self.lost_frames[target_id] = 0
+
     def add_target(self, face):
         target = FaceTarget(face['label'], face['proba'], face['box'])
         self.target_keeper.add(target)
@@ -93,11 +100,9 @@ class FaceTracker:
             if row in used_rows or col in used_cols:
                 continue
 
-            # Update bounding box coordinates of the tracked target:
+            # Update the tracked target:
             target_id = target_ids[row]
-            target = self.targets[target_id]
-            target.box = self.bound_size(faces[col]['box'])
-            self.lost_frames[target_id] = 0
+            self.update_target(target_id, faces[col])
 
             used_rows.add(row)
             used_cols.add(col)
