@@ -19,6 +19,5 @@ clf_model_param_grid = {
     'algorithm': ('ball_tree', 'kd_tree'),
 }
 
-clf_min_thres = 0.3
 clf_unknown_face_label = 'Unknown_Face'
 
