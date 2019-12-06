@@ -9,11 +9,15 @@ import numpy as np
 from queue import Queue
 from PIL import Image, ImageFile
 
-from face import FaceClassifier, FaceRecognizer, FaceWatcher, settings
-from face.video.utils import apply_device_settings
+from face import settings
+from face.watcher import FaceWatcher
+from face.classifier import FaceClassifier
+from face.recognizer import FaceRecognizer
+from face.utils.logger import init_logger
 from face.tracker import FaceTargetKeeper
 from face.vision import VisionTaskHandler
-from face.utils.logger import init_logger
+from face.video.utils import apply_device_settings
+from face.video.frame import FrameBuffer
 
 
 log = init_logger('faceid')
@@ -54,6 +58,7 @@ def run(task_handlers, batch_size, show):
             watchers.append(w)
 
         target_keeper = FaceTargetKeeper()
+        frame_buffer = FrameBuffer() if show else None
 
         while True:
             tracked = target_keeper.get()
@@ -64,7 +69,9 @@ def run(task_handlers, batch_size, show):
                 results = 'No faces found.'
 
             log.info(f'Tracking: {results}')
-            time.sleep(1)
+
+            if frame_buffer is not None:
+                frame_buffer.show()
 
     except KeyboardInterrupt:
         pass

@@ -2,9 +2,9 @@ from threading import Thread, Event
 
 from .vision import VisionTask
 from .tracker import FaceTracker
-from .utils.logger import init_logger
+from .video.frame import FrameBuffer
 from .video.utils import create_stream
-from .video.stream import VideoStream
+from .utils.logger import init_logger
 
 
 class FaceWatcher(Thread):
@@ -14,7 +14,7 @@ class FaceWatcher(Thread):
         self.stream = create_stream(video_conf)
         self.log = log or init_logger('faceid')
         self.log.info(f'Start video stream from {self.stream.path}')
-        self.show = show
+        self.frame_buffer = FrameBuffer() if show else None
         self.tracker = FaceTracker(self.stream.size)
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
@@ -35,21 +35,8 @@ class FaceWatcher(Thread):
             self.tracker.update(task.faces)
             targets = self.tracker.get_targets()
 
-            if self.show:
-                self.show_targets(frame, targets)
-
-    def show_targets(self, frame, targets):
-
-        for t in targets:
-            text = f'{t.label}: {t.proba:.2f}'
-            anchor = (t.box[0], t.box[1] - 5)
-            VideoStream.draw_text(frame, text, anchor)
-            VideoStream.draw_box(frame, t.box)
-
-        VideoStream.show(frame, title=self.stream.path)
-
-        if VideoStream.is_key_pressed('q'):
-            self.join_event.set()
+            if self.frame_buffer is not None:
+                self.frame_buffer.add(frame, targets, self.stream.path)
 
     def join(self, timeout=None):
         self.log.info(f'Stopping {self.name} thread...')
