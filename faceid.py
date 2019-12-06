@@ -108,12 +108,13 @@ def init(reset):
 
 @faceid.group()
 def model():
-    '''A face recognizer model.
+    '''Train and test a face recognizer model.
     '''
 
 
 @model.command()
-@click.option('-f', '--facedb', required=True, help='A path to the face DB.')
+@click.option('-f', '--facedb', required=True,
+              help='A path to the face database.')
 @click.option('-t', '--test-size', type=float, default=0.2, show_default=True,
               help='A size of a test part of the training data.')
 @click.option('-o', '--output', help='A path to the output model.')
@@ -121,7 +122,7 @@ def model():
 def train(facedb, test_size, output, optimize):
     '''Train a face recognizer model.
     '''
-    log.info(f'Train a face recognition model on the face DB {facedb}')
+    log.info(f'Train a face recognition model on the face database {facedb}')
 
     clf = FaceClassifier(log=log)
     clf.train(facedb, test_size, optimize)
@@ -139,12 +140,13 @@ def train(facedb, test_size, output, optimize):
 
 
 @model.command()
-@click.option('-f', '--facedb', required=True, help='A path to the face DB.')
+@click.option('-f', '--facedb', required=True,
+              help='A path to the face database.')
 @click.option('-o', '--output', help='A path to output test metrics (json).')
 def test(facedb, output):
     '''Test a face recognizer model.
     '''
-    log.info(f'Test a face recognition model on the face DB {facedb}')
+    log.info(f'Test a face recognition model on the face database {facedb}')
 
     recognizer = FaceRecognizer(log)
     score = recognizer.clf.test(facedb)
@@ -162,15 +164,16 @@ def test(facedb, output):
 
 @faceid.group()
 def db():
-    '''A face DB management.
+    '''Manage a face database.
     '''
 
 
 @db.command()
-@click.option('-f', '--facedb', required=True, help='A path to the face DB.')
+@click.option('-f', '--facedb', required=True,
+              help='A path to the face database.')
 @click.option('--force', is_flag=True, help='Force encoding all found images.')
 def init(facedb, force):
-    '''Initialize a face DB.
+    '''Initialize a face database.
     '''
     recognizer = FaceRecognizer(log)
 
@@ -178,7 +181,7 @@ def init(facedb, force):
     dirnames = [f for f in input_files if os.path.isdir(f)]
     n = len(dirnames)
 
-    log.info(f'Inspecting the face DB {facedb}')
+    log.info(f'Inspecting the face database {facedb}')
     images = []
 
     for i, dirname in enumerate(dirnames, start=1):
