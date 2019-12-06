@@ -36,7 +36,7 @@ class FaceTarget:
     @proba.setter
     def proba(self, val):
 
-        with self._lock
+        with self._lock:
             self._proba = val
 
     @property
