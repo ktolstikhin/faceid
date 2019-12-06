@@ -30,7 +30,7 @@
       "max": 64,
       "step": 1,
       "default": 20,
-      "value": 32
+      "value": 20
     },
     {
       "name": "exposure_absolute",
@@ -39,7 +39,7 @@
       "max": 5000,
       "step": 1,
       "default": 157,
-      "value": 50
+      "value": 157
     },
     {
       "name": "exposure_auto",
@@ -106,7 +106,7 @@
       "max": 128,
       "step": 1,
       "default": 100,
-      "value": 64
+      "value": 100
     },
     {
       "name": "sharpness",
@@ -123,7 +123,7 @@
       "min": 2800,
       "max": 6500,
       "step": 1,
-      "default": 4600,
+      "default": 3000,
       "value": 3000
     },
     {
