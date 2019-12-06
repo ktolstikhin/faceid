@@ -221,10 +221,5 @@ def init(facedb, force):
 
 
 if __name__ == '__main__':
-
-    try:
-        faceid()
-    except RuntimeError as e:
-        log.error(e)
-        sys.exit(1)
+    faceid()
 

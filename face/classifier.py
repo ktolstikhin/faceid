@@ -113,18 +113,18 @@ class FaceClassifier:
 
         return self.score(y_test, y_pred)
 
-    def save(self, path):
-        self.log.info(f'Save a face recognizer model to {path}')
-        joblib.dump(self.model, path)
+    def save(self, model_path):
+        self.log.info(f'Save a face recognizer model to {model_path}')
+        joblib.dump(self.model, model_path)
 
-    def load(self, path=None):
+    def load(self, model_path=None):
 
-        if path is None:
+        if model_path is None:
             self.log.info('Build a new face recognizer model...')
             model = builder.build_model(settings.clf_model_params)
         else:
-            self.log.info(f'Load a face recognizer model from {path}')
-            model = joblib.load(path)
+            self.log.info(f'Load a face recognizer model from {model_path}')
+            model = joblib.load(model_path)
 
         return model
 

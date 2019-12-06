@@ -1,5 +1,4 @@
 import re
-import glob
 from subprocess import Popen, TimeoutExpired, PIPE
 
 
@@ -8,28 +7,6 @@ class VideoDeviceSettings:
     def __init__(self, dev='/dev/video0', timeout=None):
         self.dev = dev
         self.timeout = timeout
-
-    def get(self):
-        set_str = self._exec_shell([
-            'v4l2-ctl', '-d', self.dev, '-L'
-        ])
-
-        return self._str_to_list(set_str)
-
-    def get_resolutions(self):
-        formats = self._exec_shell([
-            'v4l2-ctl', '-d', self.dev, '--list-formats-ext'
-        ])
-
-        str_list = re.findall(r'\s(\d+x\d+)', formats)
-        str_list = list(set(str_list))
-        res_list = []
-
-        for s in str_list:
-            w, h = s.split('x')
-            res_list.append((int(w), int(h)))
-
-        return sorted(res_list, key=lambda x: x[0])
 
     def reset_to_defaults(self):
         settings = self.get()
@@ -42,6 +19,13 @@ class VideoDeviceSettings:
                 pass
 
         self.set(settings)
+
+    def get(self):
+        set_str = self._exec_shell([
+            'v4l2-ctl', '-d', self.dev, '-L'
+        ])
+
+        return self._str_to_list(set_str)
 
     def set(self, settings):
         bool_sets = []
@@ -132,8 +116,4 @@ class VideoDeviceSettings:
         toks = [f'{s["name"]}={s["value"]}' for s in settings]
 
         return ','.join(toks)
-
-    @staticmethod
-    def device_list():
-        return sorted(glob.glob('/dev/video*'))
 
