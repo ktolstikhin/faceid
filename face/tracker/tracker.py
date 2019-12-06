@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import distance
 
+from .keeper import FaceTargetKeeper
 from .target import FaceTarget
 from .utils import box_center
 
@@ -22,10 +23,12 @@ class FaceTracker:
 
     def add_target(self, face):
         target = FaceTarget(face['label'], face['proba'], face['box'])
+        FaceTargetKeeper.add(target)
         self.targets[target.id] = target
         self.lost_frames[target.id] = 0
 
     def remove_target(self, target_id):
+        FaceTargetKeeper.remove(target)
         del self.targets[target_id]
         del self.lost_frames[target_id]
 

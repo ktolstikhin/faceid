@@ -11,6 +11,7 @@ from PIL import Image, ImageFile
 
 from face import FaceClassifier, FaceRecognizer, FaceWatcher, settings
 from face.video.utils import apply_device_settings
+from face.tracker import FaceTargetKeeper
 from face.vision import VisionTaskHandler
 from face.utils.logger import init_logger
 
@@ -53,11 +54,11 @@ def run(task_handlers, batch_size, show):
             watchers.append(w)
 
         while True:
-            n_watchers = sum(1 for w in watchers if w.is_alive())
-            n_handlers = sum(1 for h in handlers if h.is_alive())
-            log.info(f'Running: {n_watchers} watchers, '
-                              f'{n_handlers} handlers...')
-            time.sleep(5)
+            tracked = FaceTargetKeeper.get()
+            faces = {label: len(targets) for label, targes in tracked.items()}
+            faces = ', '.join(f'{num} {lab}' for lab, num in faces.items())
+            log.info(f'Tracking: {faces}')
+            time.sleep(1)
 
     except KeyboardInterrupt:
         pass
