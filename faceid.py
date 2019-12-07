@@ -92,9 +92,9 @@ def video():
 
 @video.command()
 @click.option('-r', '--reset', is_flag=True,
-              help='Reset to default setttings.')
-def init(reset):
-    '''Initialize video devices.
+              help='Reset device settings to defaults.')
+def config(reset):
+    '''Configure video devices.
     '''
 
     for cfg_file in settings.video_conf_files:
