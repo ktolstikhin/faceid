@@ -42,15 +42,15 @@ class FaceClassifier:
 
         return np.array(vecs), np.array(names)
 
-    def train(self, face_db, test_size=0.2, optimize_params=False):
+    def train(self, face_db, test_size=0.2, optimize=False):
         X, y = self.get_faces(face_db)
         split = train_test_split(X, y, test_size=test_size)
         X_train, X_test, y_train, y_test = split
         self.log.info(f'Data: train {X_train.shape}, test {X_test.shape}')
 
-        if optimize_params:
+        if optimize:
             self.log.info('Start optimization of model parameters...')
-            params = optimizer.optimize(
+            params = optimizer.optimize_params(
                 self.model, X_train, y_train, settings.clf_model_param_grid)
             self.log.info(f'Best params: {params}')
             self.model.set_params(**params)
