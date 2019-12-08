@@ -142,14 +142,16 @@ def train(facedb, test_size, output, optimize):
 @model.command()
 @click.option('-f', '--facedb', required=True,
               help='A path to the face database.')
+@click.option('-m', '--model', required=True,
+              help='A path to the face recognizer model.')
 @click.option('-o', '--output', help='A path to output test metrics (json).')
-def test(facedb, output):
+def test(facedb, model, output):
     '''Test a face recognizer model.
     '''
     log.info(f'Test a face recognition model on the face database {facedb}')
 
-    recognizer = FaceRecognizer(log)
-    score = recognizer.clf.test(facedb)
+    clf = FaceClassifier(model, log)
+    score = clf.test(facedb)
 
     score_json = json.dumps(score['macro avg'], indent=2)
     log.info(f'Done. Test score:\n{score_json}')
