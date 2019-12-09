@@ -31,7 +31,7 @@ class FaceRecognizer:
 
     def recognize(self, images, batch_size=32, threshold=None):
         faces = []
-        face_dets = self.detector.detect(images, batch_size)
+        face_dets = self.detector.detect_faces(images, batch_size)
 
         for img, dets in zip(images, face_dets):
 
