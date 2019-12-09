@@ -44,7 +44,13 @@ class FaceClassifier:
 
     def train(self, face_db, test_size=0.2, optimize=False):
         X, y = self.get_faces(face_db)
-        split = train_test_split(X, y, test_size=test_size)
+
+        try:
+            split = train_test_split(X, y, test_size=test_size, stratify=True)
+        except TypeError:
+            self.log.warning('Stratified split failed, use a regular one.')
+            split = train_test_split(X, y, test_size=test_size)
+
         X_train, X_test, y_train, y_test = split
         self.log.info(f'Data: train {X_train.shape}, test {X_test.shape}')
 
