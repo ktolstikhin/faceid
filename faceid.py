@@ -59,7 +59,7 @@ def run(task_handlers, batch_size, show):
             watchers.append(w)
 
         target_keeper = FaceTargetKeeper()
-        frame_buffer = FrameBuffer() if show else None
+        frame_buffer = FrameBuffer(log=log) if show else None
 
         while True:
             tracked = target_keeper.get()
@@ -153,7 +153,7 @@ def model():
 def train(facedb, test_size, output, optimize):
     '''Train a face recognizer model.
     '''
-    log.info(f'Train a face recognition model on the face database {facedb}')
+    log.info(f'Train a face recognizer on the face database {facedb}')
 
     clf = FaceClassifier(log=log)
     clf.train(facedb, test_size, optimize)
@@ -179,7 +179,7 @@ def train(facedb, test_size, output, optimize):
 def test(facedb, model, output):
     '''Test a face recognizer model.
     '''
-    log.info(f'Test a face recognition model on the face database {facedb}')
+    log.info(f'Test a face recognizer on the face database {facedb}')
 
     clf = FaceClassifier(model, log)
     score = clf.test(facedb)
@@ -252,9 +252,9 @@ def init(facedb, force):
     for i, img_file in enumerate(images, start=1):
         log.info(f'[{i}/{n}] Process image {img_file}')
         img = np.array(Image.open(img_file))
-        dets = recognizer.detector.detect(img)
+        dets = recognizer.detector.detect([img])[0]
 
-        if not dets:
+        if not len(dets):
             log.warning('No faces found. Ignore image.')
             continue
 

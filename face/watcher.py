@@ -11,9 +11,9 @@ class FaceWatcher(Thread):
     def __init__(self, task_queue, video_stream, show=False, log=None):
         self.task_queue = task_queue
         self.video_stream = video_stream
-        self.tracker = FaceTracker(video_stream.size)
-        self.frame_buffer = FrameBuffer() if show else None
         self.log = log or init_logger('faceid')
+        self.frame_buffer = FrameBuffer(log=self.log) if show else None
+        self.tracker = FaceTracker(video_stream.size)
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
 
