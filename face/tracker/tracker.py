@@ -34,20 +34,19 @@ class FaceTracker:
             target = self.targets[target_id]
             target.proba = face['proba']
             target.box = self.bound_size(face['box'])
+
             new_label = face['label']
+            target_labels = self.target_labels[target_id]
+            target_labels.append(new_label)
 
             if target.label != new_label:
-                target_labels = self.target_labels[target_id]
                 values = set(target_labels)
                 most_common_label = max(values, key=target_labels.count)
 
-                if most_common_label != new_label:
-                    target_labels.append(new_label)
-                else:
+                if most_common_label == new_label:
                     self.target_keeper.remove(target)
                     target.label = new_label
                     self.target_keeper.add(target)
-                    target_labels.clear()
 
             self.lost_frames[target_id] = 0
         except KeyError:
