@@ -1,12 +1,19 @@
+import os
+import uuid
 from threading import Lock
 
 from .stream import VideoStream
+from ..utils.logger import init_logger
 
 
 class FrameBuffer:
 
     _frames = {}
     _lock = Lock()
+
+    def __init__(self, img_dir=None, log=None):
+        self.img_dir = img_dir or '.'
+        self.log = log or init_logger('faceid')
 
     def add(self, frame, targets=None, title=None):
 
@@ -34,4 +41,9 @@ class FrameBuffer:
         if char == 'q':
             VideoStream.close_windows()
             raise KeyboardInterrupt
+        elif char == 's':
+            filename = f'{uuid.uuid4().hex}.jpg'
+            filename = os.path.join(self.img_dir, filename)
+            VideoStream.save(frame, filename)
+            self.log.info(f'Save snapshot to {filename}')
 

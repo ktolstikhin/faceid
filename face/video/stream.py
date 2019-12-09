@@ -63,6 +63,11 @@ class VideoStream:
         cv2.imshow(title, frame)
 
     @staticmethod
+    def save(frame, filename):
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(filename, frame)
+
+    @staticmethod
     def wait_key(timeout=1):
         return chr(cv2.waitKey(timeout) & 0xFF)
 
