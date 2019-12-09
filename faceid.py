@@ -106,6 +106,37 @@ def config(reset):
         apply_device_settings(cfg, reset)
 
 
+@video.command()
+@click.option('-c', '--conf-json', required=True,
+              help='A path to the video device configuration.')
+@click.option('-o', '--output', help='A path to the output images.')
+def live(conf_json, output):
+    '''Start a live video stream.
+    '''
+
+    if output is not None:
+        os.makedirs(output, exist_ok=True)
+
+    frame_buffer = FrameBuffer(output, log)
+    video_stream = create_stream(conf_json)
+    log.info(f'Start video stream from {video_stream.path}')
+
+    try:
+
+        while True:
+            frame = video_stream.read()
+
+            if frame is None:
+                log.warning(f'Failed to read from {video_stream.path}')
+                continue
+
+            frame_buffer.add(frame, title=video_stream.path)
+            frame_buffer.show()
+
+    except KeyboardInterrupt:
+        pass
+
+
 @faceid.group()
 def model():
     '''Train and test a face recognizer model.
