@@ -26,3 +26,9 @@ for model in "${models[@]}"; do
 
 done
 
+upper_body_detector=haarcascade_upperbody.xml
+
+if [ ! -e $upper_body_detector ]; then
+    wget https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/${upper_body_detector}
+fi
+
