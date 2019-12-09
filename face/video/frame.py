@@ -29,6 +29,9 @@ class FrameBuffer:
         for title, frame in frames:
             VideoStream.show(frame, title)
 
-        if VideoStream.is_key_pressed('q'):
+        char = VideoStream.wait_key()
+
+        if char == 'q':
+            VideoStream.close_windows()
             raise KeyboardInterrupt
 

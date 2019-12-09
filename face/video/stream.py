@@ -63,8 +63,8 @@ class VideoStream:
         cv2.imshow(title, frame)
 
     @staticmethod
-    def is_key_pressed(key):
-        return cv2.waitKey(1) & 0xFF == ord(key)
+    def wait_key(timeout=1):
+        return chr(cv2.waitKey(timeout) & 0xFF)
 
     @staticmethod
     def close_windows():
