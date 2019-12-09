@@ -24,7 +24,7 @@ def init_logger(name=None, verbose=False):
     stderr_h.flush = sys.stderr.flush
 
     formatter = logging.Formatter(
-        '%(asctime)s %(threadName)s %(process)d %(levelname)s > %(message)s')
+        '%(asctime)s %(threadName)s %(levelname)s > %(message)s')
 
     for h in (stdout_h, stderr_h):
         h.setFormatter(formatter)
