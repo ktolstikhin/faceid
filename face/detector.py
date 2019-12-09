@@ -3,6 +3,7 @@ import dlib
 import numpy as np
 
 from .utils.logger import init_logger
+from .utils.nonmaxsup import merge_boxes
 
 
 class FaceDetector:
@@ -35,6 +36,7 @@ class FaceDetector:
             rects = self.people_detector.detectMultiScale(
                 img, winStride=(4, 4), padding=(8, 8), scale=1.05)[0]
             det = [[x, y, x + w, y + h] for x, y, w, h in rects]
+            det = merge_boxes(det, thres=0.3)
             people_dets.append(det)
 
         return people_dets
