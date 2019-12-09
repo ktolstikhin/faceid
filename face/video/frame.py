@@ -21,9 +21,12 @@ class FrameBuffer:
 
             for t in targets:
                 text = f'{t.label}: {t.proba:.2f}'
-                anchor = (t.box[0], t.box[1] - 5)
+                anchor = (t.face_box[0], t.face_box[1] - 5)
                 VideoStream.draw_text(frame, text, anchor)
-                VideoStream.draw_box(frame, t.box)
+                VideoStream.draw_box(frame, t.face_box)
+
+                if t.body_box is not None:
+                    VideoStream.draw_box(frame, t.body_box)
 
         with self._lock:
             self._frames[title] = frame

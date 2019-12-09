@@ -6,6 +6,7 @@ from .encoder import FaceEncoder
 from .detector import FaceDetector
 from .classifier import FaceClassifier
 from .utils.logger import init_logger
+from .tracker.utils import box_center, point_in_roi
 from . import settings
 
 
@@ -30,18 +31,18 @@ class FaceRecognizer:
         os.chdir(pwd)
 
     def recognize(self, images, batch_size=32, threshold=None):
-        faces = []
-        face_dets = self.detector.detect_faces(images, batch_size)
+        img_faces = []
+        img_face_dets = self.detector.detect_faces(images, batch_size)
 
-        for img, dets in zip(images, face_dets):
+        for img, face_dets in zip(images, img_face_dets):
 
-            if not len(dets):
-                faces.append([])
+            if not len(face_dets):
+                img_faces.append([])
                 continue
 
             face_chips = []
 
-            for det in dets:
+            for det in face_dets:
                 chip = self.aligner.align(img, det)
                 face_chips.append(chip)
 
@@ -49,9 +50,21 @@ class FaceRecognizer:
             face_ids = self.clf.predict(face_vecs, threshold, proba=True)
 
             for i, face in enumerate(face_ids):
-                face['box'] = self.detector.to_list(dets[i].rect)
+                face['face_box'] = self.detector.to_list(face_dets[i].rect)
 
-            faces.append(face_ids)
+            img_faces.append(face_ids)
 
-        return faces
+        img_people_dets = self.detector.detect_people(images)
+
+        for faces, body_boxes in zip(img_faces, img_people_dets):
+
+            for face in faces:
+                face_center = box_center(face['face_box'])
+
+                for body_box in body_boxes:
+
+                    if point_in_roi(face_center, body_box):
+                        face['body_box'] = body_box
+
+        return img_faces
 

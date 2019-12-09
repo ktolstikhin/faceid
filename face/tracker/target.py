@@ -4,10 +4,11 @@ from threading import Lock
 
 class FaceTarget:
 
-    def __init__(self, label, proba, box):
+    def __init__(self, label, proba, face_box, body_box=None):
         self._label = label
         self._proba = proba
-        self._box = box
+        self._face_box = face_box
+        self._body_box = body_box
         self._lock = Lock()
         self._id = uuid.uuid4().hex
 
@@ -40,14 +41,26 @@ class FaceTarget:
             self._proba = val
 
     @property
-    def box(self):
+    def face_box(self):
 
         with self._lock:
-            return self._box
+            return self._face_box
 
-    @box.setter
-    def box(self, val):
+    @face_box.setter
+    def face_box(self, val):
 
         with self._lock:
-            self._box = val
+            self._face_box = val
+
+    @property
+    def body_box(self):
+
+        with self._lock:
+            return self._body_box
+
+    @body_box.setter
+    def body_box(self, val):
+
+        with self._lock:
+            self._body_box = val
 
