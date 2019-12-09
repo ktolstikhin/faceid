@@ -8,13 +8,11 @@ from .utils.nonmaxsup import merge_boxes
 
 class FaceDetector:
 
-    def __init__(self, model_path, log=None):
+    def __init__(self, face_detector, body_detector, log=None):
         self.log = log or init_logger('faceid')
-        self.log.info(f'Load a face detector from {model_path}')
-        self.face_detector = dlib.cnn_face_detection_model_v1(model_path)
-        self.people_detector = cv2.HOGDescriptor()
-        self.people_detector.setSVMDetector(
-            cv2.HOGDescriptor_getDefaultPeopleDetector())
+        self.log.info(f'Load a face detector from {face_detector}')
+        self.face_detector = dlib.cnn_face_detection_model_v1(face_detector)
+        self.people_detector = cv2.CascadeClassifier(body_detector)
 
     def detect_faces(self, images, batch_size=32, upsample=1):
         batches = round(len(images) / batch_size) or 1
@@ -34,7 +32,7 @@ class FaceDetector:
 
         for img in images:
             rects = self.people_detector.detectMultiScale(
-                img, winStride=(4, 4), padding=(8, 8), scale=1.05)[0]
+                img, scaleFactor=1.05, minNeighbors=5)
             det = [[x, y, x + w, y + h] for x, y, w, h in rects]
             det = merge_boxes(det, thres=0.3)
             people_dets.append(det)
