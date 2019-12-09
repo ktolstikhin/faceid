@@ -12,8 +12,8 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 # Default parameters for face model:
 clf_model_params = {
     'n_neighbors': 5,
-    'algorithm': 'kd_tree',
-    'n_jobs': -1
+    'weights': 'uniform',
+    'algorithm': 'kd_tree'
 }
 
 # Parameter grid for model optimization:
