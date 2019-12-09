@@ -1,3 +1,6 @@
+from functools import partial
+from collections import defaultdict, deque, Counter
+
 import numpy as np
 from scipy.spatial import distance
 
@@ -9,12 +12,15 @@ from .utils import box_center
 class FaceTracker:
 
     TARGET_LOST_FRAMES = 10
+    TARGET_CANDIDATES = 30
 
     def __init__(self, img_size):
         self.img_size = img_size
         self.target_keeper = FaceTargetKeeper()
         self.targets = {}
         self.lost_frames = {}
+        label_list = partial(deque, maxlen=self.TARGET_CANDIDATES)
+        self.target_labels = defaultdict(label_list)
 
     def bound_size(self, box):
         xmin, ymin, xmax, ymax = box
@@ -28,11 +34,18 @@ class FaceTracker:
             target = self.targets[target_id]
             target.proba = face['proba']
             target.box = self.bound_size(face['box'])
+            new_label = face['label']
 
-            if target.label != face['label']:
-                self.target_keeper.remove(target)
-                target.label = face['label']
-                self.target_keeper.add(target)
+            if target.label != new_label:
+                target_labels = self.target_labels[target_id]
+                label_counter = Counter(target_labels)
+
+                if label_counter.most_common()[0][0] != new_label:
+                    target_labels.append(new_label)
+                else:
+                    self.target_keeper.remove(target)
+                    target.label = new_label
+                    self.target_keeper.add(target)
 
             self.lost_frames[target_id] = 0
         except KeyError:
@@ -43,6 +56,7 @@ class FaceTracker:
         self.target_keeper.add(target)
         self.targets[target.id] = target
         self.lost_frames[target.id] = 0
+        self.target_labels[target.id].append(face['label'])
 
     def remove_target(self, target_id):
 
@@ -51,6 +65,7 @@ class FaceTracker:
             self.target_keeper.remove(target)
             del self.targets[target_id]
             del self.lost_frames[target_id]
+            del self.target_labels[target_id]
         except KeyError:
             pass
 
