@@ -12,14 +12,14 @@ from .utils import box_center
 class FaceTracker:
 
     TARGET_LOST_FRAMES = 10
-    TARGET_CANDIDATES = 30
+    TARGET_LABEL_CANDIDATES = 30
 
     def __init__(self, img_size):
         self.img_size = img_size
         self.target_keeper = FaceTargetKeeper()
         self.targets = {}
         self.lost_frames = {}
-        label_list = partial(deque, maxlen=self.TARGET_CANDIDATES)
+        label_list = partial(deque, maxlen=self.TARGET_LABEL_CANDIDATES)
         self.target_labels = defaultdict(label_list)
 
     def bound_size(self, box):
@@ -47,6 +47,7 @@ class FaceTracker:
                     self.target_keeper.remove(target)
                     target.label = new_label
                     self.target_keeper.add(target)
+                    target_labels.clear()
 
             self.lost_frames[target_id] = 0
         except KeyError:
