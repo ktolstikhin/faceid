@@ -50,8 +50,7 @@ class FaceRecognizer:
             face_ids = self.clf.predict(face_vecs, threshold, proba=True)
 
             for i, face in enumerate(face_ids):
-                rect = dets[i].rect
-                face['box'] = self.detector.rect_to_list(rect)
+                face['box'] = self.detector.to_list(dets[i].rect)
 
             faces.append(face_ids)
 

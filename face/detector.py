@@ -24,3 +24,11 @@ class FaceDetector:
 
         return np.concatenate(face_dets)
 
+    def to_list(self, rect):
+        return [rect.left(), rect.top(), rect.right(), rect.bottom()]
+
+    def to_rect(self, box):
+        xmin, ymin, xmax, ymax = box
+
+        return dlib.rectangle(left=xmin, top=ymin, right=xmax, bottom=ymax)
+
