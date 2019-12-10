@@ -33,7 +33,7 @@ class FaceTracker:
         try:
             target = self.targets[target_id]
             target.proba = face['proba']
-            target.face_box = self.bound_size(face['face_box'])
+            target.box = self.bound_size(face['box'])
 
             new_label = face['label']
             target_labels = self.target_labels[target_id]
@@ -53,10 +53,7 @@ class FaceTracker:
             pass
 
     def add_target(self, face):
-        target = FaceTarget(face['label'],
-                            face['proba'],
-                            face['face_box'],
-                            face.get('body_box'))
+        target = FaceTarget(face['label'], face['proba'], face['box'])
         self.target_keeper.add(target)
         self.targets[target.id] = target
         self.lost_frames[target.id] = 0
@@ -111,11 +108,11 @@ class FaceTracker:
 
         for tid, target in self.targets.items():
             target_ids.append(tid)
-            center = box_center(target.face_box)
+            center = box_center(target.box)
             target_centroids.append(center)
 
         target_centroids = np.array(target_centroids)
-        input_centroids = [box_center(face['face_box']) for face in faces]
+        input_centroids = [box_center(face['box']) for face in faces]
         input_centroids = np.array(input_centroids)
 
         dist = distance.cdist(target_centroids, input_centroids)
