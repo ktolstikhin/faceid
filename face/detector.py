@@ -10,16 +10,17 @@ from .utils.logger import init_logger
 class FaceDetector:
 
     DETECT_IMAGE_SIZE = (300, 300)
-    DETECT_SCORE_THRES = 0.90
+    DETECT_SCORE_THRES = 0.75
 
     def __init__(self, face_model_path, people_model_path, log=None):
         self.log = log or init_logger('faceid')
         self.log.info(f'Load a face detector from {face_model_path}')
         self.face_detector = dlib.cnn_face_detection_model_v1(face_model_path)
         self.log.info(f'Load a people detector from {people_model_path}')
+        model_name = os.path.basename(people_model_path)
         self.people_detector = cv2.dnn.readNetFromTensorflow(
-            os.path.join(people_model_path, people_model_path + '.pb'),
-            os.path.join(people_model_path, people_model_path + '.pbtxt')
+            os.path.join(people_model_path, model_name + '.pb'),
+            os.path.join(people_model_path, model_name + '.pbtxt')
         )
 
     def detect_faces(self, images, batch_size=32, upsample=1):
@@ -36,13 +37,19 @@ class FaceDetector:
         return np.concatenate(face_dets)
 
     def detect_people(self, images):
-        image_blobs = cv2.dnn.blobFromImages(images,
-                                             size=self.DETECT_IMAGE_SIZE,
-                                             mean=(127.5, 127.5, 127.5))
-        image_dets = self.people_detector.setInput(image_blobs)
-        image_dets = image_dets.reshape((len(images), 100, 7))
+        image_blob = cv2.dnn.blobFromImages(images,
+                                            size=self.DETECT_IMAGE_SIZE,
+                                            mean=(127.5, 127.5, 127.5))
+        self.people_detector.setInput(image_blob)
+        image_dets = self.people_detector.forward()
+
+        try:
+            image_dets = image_dets.reshape((len(images), 100, 7))
+        except ValueError:
+            return [[] for _ in range(len(images))]
 
         w, h = self.DETECT_IMAGE_SIZE
+        w_scale, h_scale = images[0].shape[1] / w, images[0].shape[0] / h
         person_index = 1
         people_dets = []
 
@@ -50,14 +57,19 @@ class FaceDetector:
             person_boxes = []
 
             for det in dets:
-                i, score = det[1], det[2]
+                class_index, class_score = det[1], det[2]
 
-                if i == person_index and score > self.DETECT_SCORE_THRES:
-                    xmin = det[3] * w
-                    ymin = det[4] * h
-                    xmax = det[5] * w
-                    ymax = det[6] * h
-                    person_boxes.append([xmin, ymin, xmax, ymax])
+                if class_index != person_index:
+                    continue
+
+                if class_score < self.DETECT_SCORE_THRES:
+                    continue
+
+                xmin = int(det[3] * w * w_scale)
+                ymin = int(det[4] * h * h_scale)
+                xmax = int(det[5] * w * w_scale)
+                ymax = int(det[6] * h * h_scale)
+                person_boxes.append([xmin, ymin, xmax, ymax])
 
             people_dets.append(person_boxes)
 

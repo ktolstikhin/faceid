@@ -34,7 +34,7 @@ if [ ! -e $object_detector ]; then
     wget https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/${object_detector}.pbtxt
     wget http://download.tensorflow.org/object_detectors/object_detection/${object_detector}.tar.gz
     tar -zxvf ${object_detector}.tar.gz && rm -f ${object_detector}.tar.gz
-    cp ${object_detector}/frozen_inference_graph.pb ${object_detector}.pb
+    mv ${object_detector}/frozen_inference_graph.pb ${object_detector}.pb
 
     rm -rf $object_detector
 fi
