@@ -1,5 +1,5 @@
 from functools import partial
-from collections import defaultdict, deque
+from collections import defaultdict, deque, Counter
 
 import numpy as np
 from scipy.spatial import distance
@@ -40,8 +40,8 @@ class FaceTracker:
             target_labels.append(new_label)
 
             if target.label != new_label:
-                values = set(target_labels)
-                most_common_label = max(values, key=target_labels.count)
+                counter = Counter(target_labels)
+                most_common_label = counter.most_common()[0][0]
 
                 if most_common_label == new_label:
                     self.target_keeper.remove(target)
