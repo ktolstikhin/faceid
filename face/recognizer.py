@@ -25,7 +25,7 @@ class FaceRecognizer:
 
         self.aligner = FaceAligner(cfg['face_shape_predictor'], self.log)
         self.detector = FaceDetector(cfg['face_detector'],
-                                     cfg['body_detector'],
+                                     cfg['people_detector'],
                                      self.log)
         self.encoder = FaceEncoder(cfg['face_encoder'], self.log)
         self.clf = FaceClassifier(cfg['face_classifier'], self.log)
@@ -53,7 +53,8 @@ class FaceRecognizer:
             body_dets = self.detector.detect_people([img])[0]
 
             for i, face in enumerate(face_ids):
-                face['face_box'] = self.detector.to_list(face_dets[i].rect)
+                rect = face_dets[i].rect
+                face['face_box'] = self.detector.rect_to_list(rect)
 
                 for det in body_dets:
 
