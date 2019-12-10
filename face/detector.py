@@ -12,6 +12,7 @@ class FaceDetector:
         self.log = log or init_logger('faceid')
         self.log.info(f'Load a face detector from {face_detector}')
         self.face_detector = dlib.cnn_face_detection_model_v1(face_detector)
+        self.log.info(f'Load a body detector from {body_detector}')
         self.people_detector = cv2.CascadeClassifier(body_detector)
 
     def detect_faces(self, images, batch_size=32, upsample=1):
