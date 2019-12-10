@@ -1,13 +1,13 @@
 import os
 import json
 
+from . import settings
 from .aligner import FaceAligner
 from .encoder import FaceEncoder
 from .detector import FaceDetector
 from .classifier import FaceClassifier
-from .utils.logger import init_logger
-from .tracker.utils import box_center, box_in_roi
-from . import settings
+from .tracker.utils import box_center
+from utils.logger import init_logger
 
 
 class FaceRecognizer:
@@ -24,8 +24,7 @@ class FaceRecognizer:
             cfg = json.load(f)
 
         self.aligner = FaceAligner(cfg['face_shape_predictor'], self.log)
-        self.detector = FaceDetector(cfg['face_detector'],
-                                     cfg['people_detector'], self.log)
+        self.detector = FaceDetector(cfg['face_detector'], self.log)
         self.encoder = FaceEncoder(cfg['face_encoder'], self.log)
         self.clf = FaceClassifier(cfg['face_classifier'], self.log)
 
@@ -33,7 +32,7 @@ class FaceRecognizer:
 
     def recognize(self, images, batch_size=32, threshold=None):
         faces = []
-        face_dets = self.detector.detect_faces(images, batch_size)
+        face_dets = self.detector.detect(images, batch_size)
 
         for img, dets in zip(images, face_dets):
 

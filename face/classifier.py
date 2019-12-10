@@ -7,9 +7,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import matthews_corrcoef, classification_report
 
-from .model import builder, optimizer
-from .utils.logger import init_logger
 from . import settings
+from .model import builder, optimizer
+from utils.logger import init_logger
 
 
 class FaceClassifier:

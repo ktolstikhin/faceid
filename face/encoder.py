@@ -1,7 +1,7 @@
 import dlib
 import numpy as np
 
-from .utils.logger import init_logger
+from utils.logger import init_logger
 
 
 class FaceEncoder:

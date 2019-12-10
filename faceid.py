@@ -13,11 +13,11 @@ from face import settings
 from face.watcher import FaceWatcher
 from face.classifier import FaceClassifier
 from face.recognizer import FaceRecognizer
-from face.utils.logger import init_logger
 from face.tracker import FaceTargetKeeper
 from face.vision import VisionTaskHandler
 from face.video.frame import FrameBuffer
 from face.video.utils import create_stream, apply_device_settings
+from utils.logger import init_logger
 
 
 log = init_logger('faceid')

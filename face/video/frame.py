@@ -3,7 +3,7 @@ import uuid
 from threading import Lock
 
 from .stream import VideoStream
-from ..utils.logger import init_logger
+from utils.logger import init_logger
 
 
 class FrameBuffer:

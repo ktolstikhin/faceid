@@ -1,6 +1,6 @@
 import dlib
 
-from .utils.logger import init_logger
+from utils.logger import init_logger
 
 
 class FaceAligner:

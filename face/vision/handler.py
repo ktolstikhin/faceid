@@ -1,8 +1,8 @@
 import queue
 from threading import Thread, Event
 
-from ..utils.logger import init_logger
 from ..recognizer import FaceRecognizer
+from utils.logger import init_logger
 
 
 class VisionTaskHandler(Thread):

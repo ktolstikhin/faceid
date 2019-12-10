@@ -3,7 +3,7 @@ from threading import Thread, Event
 from .vision import VisionTask
 from .tracker import FaceTracker
 from .video.frame import FrameBuffer
-from .utils.logger import init_logger
+from utils.logger import init_logger
 
 
 class FaceWatcher(Thread):
