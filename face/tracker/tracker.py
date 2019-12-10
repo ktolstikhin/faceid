@@ -12,7 +12,7 @@ from .utils import box_center
 class FaceTracker:
 
     TARGET_LOST_FRAMES = 10
-    TARGET_LABEL_CANDIDATES = 20
+    TARGET_LABEL_CANDIDATES = 15
 
     def __init__(self, img_size):
         self.img_size = img_size
