@@ -1,6 +1,7 @@
 import queue
 from threading import Thread, Event
 
+from .predictor import PredictorFactory
 from utils.logger import init_logger
 
 
@@ -8,8 +9,8 @@ class VisionTaskHandler(Thread):
 
     QUEUE_GET_TIMEOUT = 5
 
-    def __init__(self, predictor, task_queue, batch_size=32, log=None):
-        self.predictor = predictor
+    def __init__(self, name, task_queue, batch_size=32, log=None):
+        self.predictor = PredictorFactory.build(name, log)
         self.task_queue = task_queue
         self.batch_size = batch_size
         self.log = log or init_logger('faceid')

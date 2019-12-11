@@ -1,16 +1,16 @@
 import os
 import json
 
-from . import settings
 from .aligner import FaceAligner
 from .encoder import FaceEncoder
 from .detector import FaceDetector
 from .classifier import FaceClassifier
-from .tracker.utils import box_center
+from vision.predictor import Predictor
 from utils.logger import init_logger
+import settings
 
 
-class FaceRecognizer:
+class FaceRecognizer(Predictor):
 
     def __init__(self, log=None):
         self.log = log or init_logger('faceid')
