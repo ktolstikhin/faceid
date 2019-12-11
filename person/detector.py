@@ -9,7 +9,7 @@ from utils.logger import init_logger
 from vision.predictor.abc import Predictor
 
 
-class PeopleDetector(Predictor):
+class PersonDetector(Predictor):
 
     DETECT_IMAGE_SIZE = (300, 300)
     DETECT_SCORE_THRES = 0.75
@@ -25,8 +25,8 @@ class PeopleDetector(Predictor):
         with open(settings.model_conf_file) as f:
             cfg = json.load(f)
 
-        model_path = cfg['people_detector']
-        self.log.info(f'Load a people detector from {model_path}')
+        model_path = cfg['person_detector']
+        self.log.info(f'Load a person detector from {model_path}')
 
         model_name = os.path.basename(model_path)
         self.detector = cv2.dnn.readNetFromTensorflow(

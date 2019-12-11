@@ -1,5 +1,5 @@
 from face.recognizer import FaceRecognizer
-from people.detector import PeopleDetector
+from person.detector import PersonDetector
 
 
 class PredictorFactory:
@@ -9,8 +9,8 @@ class PredictorFactory:
 
         if name == 'face':
             predictor = FaceRecognizer(log)
-        elif name == 'people':
-            predictor = PeopleDetector(log)
+        elif name == 'person':
+            predictor = PersonDetector(log)
         else:
             raise TypeError(f'Unknown predictor: {name}')
 

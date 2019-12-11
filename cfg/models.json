@@ -3,5 +3,5 @@
     "face_encoder": "../models/dlib_face_recognition_resnet_model_v1.dat",
     "face_shape_predictor": "../models/shape_predictor_68_face_landmarks.dat",
     "face_classifier": "../models/face_clf.pkl",
-    "people_detector": "../models/ssd_mobilenet_v1_coco_2017_11_17"
+    "person_detector": "../models/ssd_mobilenet_v1_coco_2017_11_17"
 }

@@ -26,16 +26,16 @@ for model in "${dlib_models[@]}"; do
 
 done
 
-people_detector=ssd_mobilenet_v1_coco_2017_11_17
+person_detector=ssd_mobilenet_v1_coco_2017_11_17
 
-if [ ! -e $people_detector ]; then
-    mkdir $people_detector && cd $people_detector
+if [ ! -e $person_detector ]; then
+    mkdir $person_detector && cd $person_detector
 
-    wget https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/${people_detector}.pbtxt
-    wget http://download.tensorflow.org/people_detectors/object_detection/${people_detector}.tar.gz
-    tar -zxvf ${people_detector}.tar.gz && rm -f ${people_detector}.tar.gz
-    mv ${people_detector}/frozen_inference_graph.pb ${people_detector}.pb
+    wget https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/${person_detector}.pbtxt
+    wget http://download.tensorflow.org/person_detectors/object_detection/${person_detector}.tar.gz
+    tar -zxvf ${person_detector}.tar.gz && rm -f ${person_detector}.tar.gz
+    mv ${person_detector}/frozen_inference_graph.pb ${person_detector}.pb
 
-    rm -rf $people_detector
+    rm -rf $person_detector
 fi
 
