@@ -14,9 +14,9 @@ from face.watcher import FaceWatcher
 from face.classifier import FaceClassifier
 from face.recognizer import FaceRecognizer
 from face.tracker import FaceTargetKeeper
-from face.vision import VisionTaskHandler
 from face.video.frame import FrameBuffer
 from face.video.utils import create_stream, apply_device_settings
+from vision import VisionTaskHandler
 from utils.logger import init_logger
 
 
@@ -44,7 +44,8 @@ def run(task_handlers, batch_size, show):
         log.info(f'Start {task_handlers} vision task handler(s)...')
 
         for _ in range(task_handlers):
-            h = VisionTaskHandler(task_queue, batch_size, log)
+            predictor = FaceRecognizer(log)
+            h = VisionTaskHandler(predictor, task_queue, batch_size, log)
             h.start()
             handlers.append(h)
 

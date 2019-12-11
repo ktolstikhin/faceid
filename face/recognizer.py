@@ -30,7 +30,7 @@ class FaceRecognizer:
 
         os.chdir(pwd)
 
-    def recognize(self, images, batch_size=32, threshold=None):
+    def predict(self, images, batch_size=32, threshold=None):
         faces = []
         face_dets = self.detector.detect(images, batch_size)
 

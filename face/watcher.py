@@ -1,9 +1,9 @@
 from threading import Thread, Event
 
-from .vision import VisionTask
 from .tracker import FaceTracker
 from .video.frame import FrameBuffer
 from utils.logger import init_logger
+from vision import VisionTask
 
 
 class FaceWatcher(Thread):
@@ -30,7 +30,7 @@ class FaceWatcher(Thread):
 
             task.image = frame
             self.task_queue.put(task)
-            self.tracker.update(task.faces)
+            self.tracker.update(task.results)
             targets = self.tracker.get_targets()
 
             if self.frame_buffer is not None:

@@ -1,7 +1,6 @@
 import queue
 from threading import Thread, Event
 
-from ..recognizer import FaceRecognizer
 from utils.logger import init_logger
 
 
@@ -9,11 +8,11 @@ class VisionTaskHandler(Thread):
 
     QUEUE_GET_TIMEOUT = 5
 
-    def __init__(self, task_queue, batch_size=32, log=None):
+    def __init__(self, predictor, task_queue, batch_size=32, log=None):
+        self.predictor = predictor
         self.task_queue = task_queue
         self.batch_size = batch_size
         self.log = log or init_logger('faceid')
-        self.recognizer = FaceRecognizer(self.log)
         self.join_event = Event()
         super().__init__(name='VisionTaskHandler')
 
@@ -37,10 +36,10 @@ class VisionTaskHandler(Thread):
                 continue
 
             images = [t.image for t in tasks]
-            faces = self.recognizer.recognize(images, self.batch_size)
+            predictions = self.predictor.predict(images, self.batch_size)
 
             for i, task in enumerate(tasks):
-                task.faces = faces[i]
+                task.results = predictions[i]
                 self.task_queue.task_done()
 
     def join(self, timeout=None):
