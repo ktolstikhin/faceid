@@ -2,7 +2,7 @@ import uuid
 from threading import Lock
 
 
-class FaceTarget:
+class Target:
 
     def __init__(self, label, proba, box):
         self._label = label

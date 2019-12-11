@@ -3,17 +3,17 @@ from threading import Lock
 from collections import defaultdict
 
 
-class FaceTargetKeeper:
+class TargetKeeper:
 
     _targets = {}
-    _faces = defaultdict(dict)
+    _target_groups = defaultdict(dict)
     _lock = Lock()
 
     def add(self, target):
 
         with self._lock:
             self._targets[target.id] = target
-            self._faces[target.label][target.id] = target
+            self._target_groups[target.label][target.id] = target
 
     def remove(self, target):
 
@@ -21,10 +21,10 @@ class FaceTargetKeeper:
 
             try:
                 del self._targets[target.id]
-                del self._faces[target.label][target.id]
+                del self._target_groups[target.label][target.id]
 
-                if not self._faces[target.label]:
-                    del self._faces[target.label]
+                if not self._target_groups[target.label]:
+                    del self._target_groups[target.label]
 
             except KeyError:
                 pass
@@ -34,10 +34,10 @@ class FaceTargetKeeper:
         with self._lock:
 
             if label is None and target_id is None:
-                return {l: copy(d) for l, d in self._faces.items()}
+                return {l: copy(d) for l, d in self._target_groups.items()}
 
             if target_id is None:
-                return copy(self._faces.get(label))
+                return copy(self._target_groups.get(label))
             else:
                 return self._targets.get(target_id)
 

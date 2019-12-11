@@ -4,19 +4,19 @@ from collections import defaultdict, deque, Counter
 import numpy as np
 from scipy.spatial import distance
 
-from .keeper import FaceTargetKeeper
-from .target import FaceTarget
+from .target import Target
+from .keeper import TargetKeeper
 from .utils import box_center
 
 
-class FaceTracker:
+class TargetTracker:
 
     TARGET_LOST_FRAMES = 10
     TARGET_LABEL_CANDIDATES = 10
 
     def __init__(self, img_size):
         self.img_size = img_size
-        self.target_keeper = FaceTargetKeeper()
+        self.target_keeper = TargetKeeper()
         self.targets = {}
         self.lost_frames = {}
         label_list = partial(deque, maxlen=self.TARGET_LABEL_CANDIDATES)
@@ -28,14 +28,14 @@ class FaceTracker:
 
         return max(0, xmin), max(0, ymin), min(w, xmax), min(h, ymax)
 
-    def update_target(self, target_id, face):
+    def update_target(self, target_id, prediction):
 
         try:
             target = self.targets[target_id]
-            target.proba = face['proba']
-            target.box = self.bound_size(face['box'])
+            target.proba = prediction['proba']
+            target.box = self.bound_size(prediction['box'])
 
-            new_label = face['label']
+            new_label = prediction['label']
             target_labels = self.target_labels[target_id]
             target_labels.append(new_label)
 
@@ -52,12 +52,14 @@ class FaceTracker:
         except KeyError:
             pass
 
-    def add_target(self, face):
-        target = FaceTarget(face['label'], face['proba'], face['box'])
+    def add_target(self, prediction):
+        target = Target(prediction['label'],
+                        prediction['proba'],
+                        prediction['box'])
         self.target_keeper.add(target)
         self.targets[target.id] = target
         self.lost_frames[target.id] = 0
-        self.target_labels[target.id].append(face['label'])
+        self.target_labels[target.id].append(prediction['label'])
 
     def remove_target(self, target_id):
 
@@ -73,12 +75,12 @@ class FaceTracker:
     def get_targets(self):
         return self.targets.values()
 
-    def update(self, faces):
-        # If the input list of detected faces is empty, increment lost frame
+    def update(self, predictions):
+        # If the input list of detected objects is empty, increment lost frame
         # counter for all of the tracked targets. If number of frames without a
         # tracked target has exceeded a certain threshold, remove this target
         # from the tracked ones.
-        if not faces:
+        if not predictions:
             lost_targets = []
 
             for target_id in self.targets:
@@ -92,17 +94,17 @@ class FaceTracker:
 
             return self
 
-        # If there are no tracked targets, add all the detected faces to the
+        # If there are no tracked targets, add all the detected objects to the
         # tracked targets.
         if not self.targets:
 
-            for face in faces:
-                self.add_target(face)
+            for p in predictions:
+                self.add_target(p)
 
             return self
 
         # Perform a match between centroids of bounding boxes of the detected
-        # faces and tracked targets based on the euclidean distance between
+        # objects and tracked targets based on the euclidean distance between
         # them.
         target_ids, target_centroids = [], []
 
@@ -112,13 +114,14 @@ class FaceTracker:
             target_centroids.append(center)
 
         target_centroids = np.array(target_centroids)
-        input_centroids = [box_center(face['box']) for face in faces]
+        input_centroids = [box_center(p['box']) for p in predictions]
         input_centroids = np.array(input_centroids)
 
         dist = distance.cdist(target_centroids, input_centroids)
 
         # Sort distances between centroids. Here, "rows" is index array of
-        # tracked targets, and "cols" is index array of closest detected faces.
+        # tracked targets, and "cols" is index array of closest detected
+        # objects.
         rows = dist.min(axis=1).argsort()
         cols = dist.argmin(axis=1)[rows]
 
@@ -131,7 +134,7 @@ class FaceTracker:
 
             # Update the tracked target:
             target_id = target_ids[row]
-            self.update_target(target_id, faces[col])
+            self.update_target(target_id, predictions[col])
 
             used_rows.add(row)
             used_cols.add(col)
@@ -140,7 +143,7 @@ class FaceTracker:
         unused_cols = set(range(dist.shape[1])).difference(used_cols)
 
         # If number of tracked targets is greater than the number of detected
-        # faces, update lost frame counters of tracked targets which have not
+        # objects, update lost frame counters of tracked targets which have not
         # been found. Otherwise, add new targets to the tracked ones.
         if dist.shape[0] > dist.shape[1]:
             lost_targets = []
@@ -158,7 +161,7 @@ class FaceTracker:
         else:
 
             for col in unused_cols:
-                self.add_target(faces[col])
+                self.add_target(predictions[col])
 
         return self
 
