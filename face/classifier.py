@@ -9,7 +9,7 @@ from sklearn.metrics import matthews_corrcoef, classification_report
 
 from .model import builder, optimizer
 from utils.logger import init_logger
-import settings
+from cfg import settings
 
 
 class FaceClassifier:

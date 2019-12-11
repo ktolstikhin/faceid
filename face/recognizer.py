@@ -7,7 +7,7 @@ from .detector import FaceDetector
 from .classifier import FaceClassifier
 from vision.predictor.abc import Predictor
 from utils.logger import init_logger
-import settings
+from cfg import settings
 
 
 class FaceRecognizer(Predictor):

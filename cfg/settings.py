@@ -3,7 +3,7 @@ from pathlib import Path
 from PIL import ImageFile
 
 
-root = Path(__file__).parent.joinpath('cfg')
+root = Path(__file__).parent
 model_conf_file = root.joinpath('models.json')
 video_conf_files = list(root.joinpath('video').glob('*.json'))
 

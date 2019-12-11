@@ -9,7 +9,7 @@ import click
 import numpy as np
 from PIL import Image
 
-import settings
+from cfg import settings
 from face.watcher import FaceWatcher
 from face.classifier import FaceClassifier
 from face.recognizer import FaceRecognizer

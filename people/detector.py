@@ -4,7 +4,7 @@ import json
 import cv2
 import numpy as np
 
-import settings
+from cfg import settings
 from utils.logger import init_logger
 from vision.predictor.abc import Predictor
 
