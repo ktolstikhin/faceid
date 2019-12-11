@@ -1,14 +1,5 @@
-from abc import ABC, abstractmethod
-
 from face.recognizer import FaceRecognizer
 from people.detector import PeopleDetector
-
-
-class Predictor(ABC):
-
-    @abstractmethod
-    def predict(self, images, **kwargs):
-        raise NotImplementedError
 
 
 class PredictorFactory:

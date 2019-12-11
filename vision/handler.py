@@ -1,7 +1,7 @@
 import queue
 from threading import Thread, Event
 
-from .predictor import PredictorFactory
+from .predictor.factory import PredictorFactory
 from utils.logger import init_logger
 
 

@@ -1,9 +1,12 @@
 import os
+import json
 
 import cv2
+import numpy as np
 
+import settings
 from utils.logger import init_logger
-from vision.predictor import Predictor
+from vision.predictor.abc import Predictor
 
 
 class PeopleDetector(Predictor):
@@ -43,8 +46,6 @@ class PeopleDetector(Predictor):
         try:
             image_dets = image_dets.reshape((len(images), 100, 7))
         except ValueError:
-            self.log.warning('Detection failed: Wrong results shape!')
-
             return [[] for _ in range(len(images))]
 
         w, h = self.DETECT_IMAGE_SIZE

@@ -9,14 +9,14 @@ import click
 import numpy as np
 from PIL import Image
 
-from face import settings
+import settings
 from face.watcher import FaceWatcher
 from face.classifier import FaceClassifier
 from face.recognizer import FaceRecognizer
 from tracker import TargetKeeper
 from video.frame import FrameBuffer
 from video.utils import create_stream, apply_device_settings
-from vision import VisionTaskHandler
+from vision.handler import VisionTaskHandler
 from utils.logger import init_logger
 
 

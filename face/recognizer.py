@@ -5,7 +5,7 @@ from .aligner import FaceAligner
 from .encoder import FaceEncoder
 from .detector import FaceDetector
 from .classifier import FaceClassifier
-from vision.predictor import Predictor
+from vision.predictor.abc import Predictor
 from utils.logger import init_logger
 import settings
 

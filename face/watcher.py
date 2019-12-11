@@ -1,9 +1,9 @@
 from threading import Thread, Event
 
-from .tracker import FaceTracker
+from tracker import TargetTracker
+from vision.task import VisionTask
 from video.frame import FrameBuffer
 from utils.logger import init_logger
-from vision import VisionTask
 
 
 class FaceWatcher(Thread):
@@ -13,7 +13,7 @@ class FaceWatcher(Thread):
         self.video_stream = video_stream
         self.log = log or init_logger('faceid')
         self.frame_buffer = FrameBuffer(log=self.log) if show else None
-        self.tracker = FaceTracker(video_stream.size)
+        self.tracker = TargetTracker(video_stream.size)
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
 
