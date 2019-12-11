@@ -30,8 +30,8 @@ class PersonDetector(Predictor):
 
         model_name = os.path.basename(model_path)
         self.detector = cv2.dnn.readNetFromTensorflow(
-            os.path.join(model_path, model_name + '.pb'),
-            os.path.join(model_path, model_name + '.pbtxt')
+            os.path.join(model_path, f'{model_name}.pb'),
+            os.path.join(model_path, f'{model_name}.pbtxt')
         )
 
         os.chdir(pwd)
@@ -49,7 +49,9 @@ class PersonDetector(Predictor):
             return [[] for _ in range(len(images))]
 
         w, h = self.DETECT_IMAGE_SIZE
-        w_scale, h_scale = images[0].shape[1] / w, images[0].shape[0] / h
+        img_h, img_w = images[0].shape[:2]
+        w_scale, h_scale = img_w / w, img_h / h
+
         person_index = 1
         people_dets = []
 
