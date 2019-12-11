@@ -12,7 +12,7 @@ from vision.predictor.abc import Predictor
 class PersonDetector(Predictor):
 
     DETECT_IMAGE_SIZE = (300, 300)
-    DETECT_SCORE_THRES = 0.75
+    DETECT_PROBA_THRES = 0.75
 
     def __init__(self, log=None):
         self.log = log or init_logger('faceid')
@@ -53,29 +53,34 @@ class PersonDetector(Predictor):
         w_scale, h_scale = img_w / w, img_h / h
 
         person_index = 1
-        people_dets = []
+        image_persons = []
 
         for dets in image_dets:
-            person_boxes = []
+            persons = []
 
             for det in dets:
-                class_index, class_score = det[1], det[2]
+                class_index, class_proba = det[1], det[2]
 
                 if class_index != person_index:
                     continue
 
-                if class_score < self.DETECT_SCORE_THRES:
+                if class_proba < self.DETECT_PROBA_THRES:
                     continue
 
                 xmin = int(det[3] * w * w_scale)
                 ymin = int(det[4] * h * h_scale)
                 xmax = int(det[5] * w * w_scale)
                 ymax = int(det[6] * h * h_scale)
-                person_boxes.append([xmin, ymin, xmax, ymax])
 
-            people_dets.append(person_boxes)
+                persons.append({
+                    'label': 'person',
+                    'proba': class_proba,
+                    'box': [xmin, ymin, xmax, ymax]
+                })
 
-        return people_dets
+            image_persons.append(persons)
+
+        return image_persons
 
     def predict(self, images, batch_size=32):
         batches = round(len(images) / batch_size) or 1
@@ -88,5 +93,5 @@ class PersonDetector(Predictor):
             batch_preds = self.detect(batch)
             predictions.append(batch_preds)
 
-        return np.concatenate(predictions)
+        return [i for batch in predictions for i in batch]
 
