@@ -1,7 +1,7 @@
 from threading import Thread, Event
 
 from .tracker import FaceTracker
-from .video.frame import FrameBuffer
+from video.frame import FrameBuffer
 from utils.logger import init_logger
 from vision import VisionTask
 

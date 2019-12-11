@@ -29,6 +29,8 @@ class PopleDetector:
         try:
             image_dets = image_dets.reshape((len(images), 100, 7))
         except ValueError:
+            self.log.warning('Detection failed: Wrong results shape!')
+
             return [[] for _ in range(len(images))]
 
         w, h = self.DETECT_IMAGE_SIZE

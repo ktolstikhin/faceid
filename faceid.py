@@ -14,8 +14,8 @@ from face.watcher import FaceWatcher
 from face.classifier import FaceClassifier
 from face.recognizer import FaceRecognizer
 from face.tracker import FaceTargetKeeper
-from face.video.frame import FrameBuffer
-from face.video.utils import create_stream, apply_device_settings
+from video.frame import FrameBuffer
+from video.utils import create_stream, apply_device_settings
 from vision import VisionTaskHandler
 from utils.logger import init_logger
 
