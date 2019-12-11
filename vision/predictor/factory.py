@@ -12,7 +12,7 @@ class PredictorFactory:
         elif name == 'person':
             predictor = PersonDetector(log)
         else:
-            raise TypeError(f'Unknown predictor: {name}')
+            raise ValueError(f'Unknown predictor: {name}')
 
         return predictor
 
