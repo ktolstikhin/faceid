@@ -10,10 +10,10 @@ class VisionTaskHandler(Thread):
     QUEUE_GET_TIMEOUT = 5
 
     def __init__(self, name, task_queue, batch_size=32, log=None):
-        self.predictor = PredictorFactory.build(name, log)
+        self.log = log or init_logger('faceid')
+        self.predictor = PredictorFactory.build(name, self.log)
         self.task_queue = task_queue
         self.batch_size = batch_size
-        self.log = log or init_logger('faceid')
         self.join_event = Event()
         super().__init__(name='VisionTaskHandler')
 
