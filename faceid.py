@@ -35,12 +35,14 @@ def faceid():
 @click.option('-b', '--batch-size', type=int, default=32, show_default=True,
               help='A size of a vision task batch.')
 @click.option('-s', '--show', is_flag=True, help='Show tracked faces.')
-def run(task_handlers, batch_size, show):
+@click.option('-v', '--video-processes', is_flag=True,
+              help='Use a separate process for each video stream.')
+def run(task_handlers, batch_size, show, video_processes):
     '''Start watching faces.
     '''
     try:
         task_queue = Queue()
-        handlers, watchers = [], []
+        handlers, watchers, streams = [], [], []
         log.info(f'Start {task_handlers} vision task handler(s)...')
 
         for _ in range(task_handlers):
@@ -52,7 +54,14 @@ def run(task_handlers, batch_size, show):
         log.info(f'Start {watcher_num} face watcher(s)...')
 
         for conf_file in settings.video_conf_files:
-            video_stream = create_stream(conf_file)
+
+            if video_processes:
+                video_stream = create_stream(conf_file, multiprocessing=True)
+                video_stream.start()
+                streams.append(video_stream)
+            else:
+                video_stream = create_stream(conf_file)
+
             log.info(f'Start video stream from {video_stream.path}')
             w = FaceWatcher(task_queue, video_stream, show, log)
             w.start()
@@ -78,7 +87,7 @@ def run(task_handlers, batch_size, show):
         pass
     finally:
         # First, join watchers, then handlers. The order does matter.
-        threads = watchers + handlers
+        threads = watchers + handlers + streams
 
         for t in threads:
             t.join()

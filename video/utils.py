@@ -1,10 +1,11 @@
 import json
 
-from .settings import VideoDeviceSettings
 from .stream import VideoStream
+from .process import VideoStreamProcess
+from .settings import VideoDeviceSettings
 
 
-def create_stream(conf_file, configure=False):
+def create_stream(conf_file, configure=False, multiprocessing=False):
 
     with open(conf_file) as f:
         cfg = json.load(f)
@@ -15,7 +16,12 @@ def create_stream(conf_file, configure=False):
     path = cfg['path']
     size = tuple(cfg['resolution'])
 
-    return VideoStream(path, size)
+    if not multiprocessing:
+        stream = VideoStream(path, size)
+    else:
+        stream = VideoStreamProcess(path, size)
+
+    return stream
 
 
 def apply_device_settings(cfg, reset=False):
