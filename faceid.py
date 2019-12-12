@@ -56,13 +56,15 @@ def run(task_handlers, batch_size, show, video_processes):
         for conf_file in settings.video_conf_files:
 
             if video_processes:
-                video_stream = create_stream(conf_file, multiprocessing=True)
+                video_stream = create_stream(conf_file,
+                                             multiprocessing=True,
+                                             log=log)
                 video_stream.start()
                 streams.append(video_stream)
             else:
                 video_stream = create_stream(conf_file)
 
-            log.info(f'Start video stream from {video_stream.path}')
+            log.info(f'Create video stream from {video_stream.path}')
             w = FaceWatcher(task_queue, video_stream, show, log)
             w.start()
             watchers.append(w)

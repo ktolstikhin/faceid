@@ -5,7 +5,7 @@ from .process import VideoStreamProcess
 from .settings import VideoDeviceSettings
 
 
-def create_stream(conf_file, configure=False, multiprocessing=False):
+def create_stream(conf_file, configure=False, multiprocessing=False, log=None):
 
     with open(conf_file) as f:
         cfg = json.load(f)
@@ -19,7 +19,7 @@ def create_stream(conf_file, configure=False, multiprocessing=False):
     if not multiprocessing:
         stream = VideoStream(path, size)
     else:
-        stream = VideoStreamProcess(path, size)
+        stream = VideoStreamProcess(path, size, log)
 
     return stream
 

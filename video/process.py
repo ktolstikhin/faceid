@@ -13,8 +13,7 @@ class VideoStreamProcess(Process):
         self._stream = VideoStream(path, size)
         self._join_event = Event()
         self._log = log or init_logger('faceid')
-        w, h = size
-        self._frame_shape = (h, w, 3)
+        self._frame_shape = (size[1], size[0], 3)
         array_size = int(np.prod(self._frame_shape))
         self._frame = Array(ctypes.c_int8, array_size)
         super().__init__(name='VideoStream')
@@ -38,15 +37,20 @@ class VideoStreamProcess(Process):
             return self._shared_to_numpy()
 
     def run(self):
+        self._log.info(f'Start fetching frames from {self.path}')
 
         while not self._join_event.is_set():
             frame = self._stream.read()
+
+            if frame is None:
+                continue
 
             with self._frame.get_lock():
                 arr = self._shared_to_numpy()
                 np.copyto(arr, frame)
 
     def join(self, timeout=None):
+        self._log.info(f'Stopping {self.name} process...')
         self._join_event.set()
         super().join(timeout)
 
