@@ -17,13 +17,14 @@ class FrameBuffer:
 
     def add(self, frame, targets=None, title=None):
 
-        if targets is not None:
+        if targets is None:
+            targets = []
 
-            for t in targets:
-                text = f'{t.label}: {t.proba:.2f}'
-                anchor = (t.box[0], t.box[1] - 5)
-                VideoStream.draw_text(frame, text, anchor)
-                VideoStream.draw_box(frame, t.box)
+        for t in targets:
+            text = f'{t.label}: {t.proba:.2f}'
+            anchor = (t.box[0], t.box[1] - 5)
+            VideoStream.draw_text(frame, text, anchor)
+            VideoStream.draw_box(frame, t.box)
 
         with self._lock:
             self._frames[title] = frame
@@ -41,9 +42,10 @@ class FrameBuffer:
         if char == 'q':
             VideoStream.close_windows()
             raise KeyboardInterrupt
-        elif char == 's':
+
+        if char == 's':
             filename = f'{uuid.uuid4().hex}.jpg'
-            filename = os.path.join(self.img_dir, filename)
-            VideoStream.save(frame, filename)
-            self.log.info(f'Save snapshot to {filename}')
+            filepath = os.path.join(self.img_dir, filename)
+            VideoStream.save(frame, filepath)
+            self.log.info(f'Save snapshot to {filepath}')
 
