@@ -21,12 +21,14 @@ def create_stream(conf_file, configure=False):
 def apply_device_settings(cfg, reset=False):
     s = cfg.get('settings')
 
-    if s is not None:
-        vds = VideoDeviceSettings(cfg['path'])
+    if s is None:
+        return
 
-        if reset:
-            vds.reset_to_defaults()
-        else:
-            vds.exposure_manual()
-            vds.set(s)
+    vds = VideoDeviceSettings(cfg['path'])
+
+    if reset:
+        vds.reset_to_defaults()
+    else:
+        vds.exposure_manual()
+        vds.set(s)
 

@@ -17,13 +17,14 @@ class FrameBuffer:
 
     def add(self, frame, targets=None, title=None):
 
-        if targets is not None:
+        if targets is None:
+            targets = []
 
-            for t in targets:
-                text = f'{t.label}: {t.proba:.2f}'
-                anchor = (t.box[0], t.box[1] - 5)
-                VideoStream.draw_text(frame, text, anchor)
-                VideoStream.draw_box(frame, t.box)
+        for t in targets:
+            text = f'{t.label}: {t.proba:.2f}'
+            anchor = (t.box[0], t.box[1] - 5)
+            VideoStream.draw_text(frame, text, anchor)
+            VideoStream.draw_box(frame, t.box)
 
         with self._lock:
             self._frames[title] = frame
