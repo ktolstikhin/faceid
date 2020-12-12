@@ -1,9 +1,10 @@
 import os
 import uuid
+import logging
 from threading import Lock
 
+from cfg import settings
 from .stream import VideoStream
-from utils.logger import init_logger
 
 
 class FrameBuffer:
@@ -11,9 +12,12 @@ class FrameBuffer:
     _frames = {}
     _lock = Lock()
 
-    def __init__(self, img_dir=None, log=None):
+    def __init__(self, img_dir=None):
         self.img_dir = img_dir or '.'
-        self.log = log or init_logger('faceid')
+
+    @property
+    def log(self):
+        return logging.getLogger(settings.logger)
 
     def add(self, frame, targets=None, title=None):
 

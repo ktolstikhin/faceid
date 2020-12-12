@@ -25,3 +25,5 @@ clf_model_param_grid = {
 
 clf_unknown_face_label = 'Unknown_Face'
 
+logger = 'face_id'
+

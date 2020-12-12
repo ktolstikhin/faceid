@@ -1,21 +1,25 @@
+import logging
 from threading import Thread, Event
 
+from cfg import settings
 from tracker import TargetTracker
 from vision.task import VisionTask
 from video.frame import FrameBuffer
-from utils.logger import init_logger
 
 
 class FaceWatcher(Thread):
 
-    def __init__(self, task_queue, video_stream, show=False, log=None):
+    def __init__(self, task_queue, video_stream, show=False):
         self.task_queue = task_queue
         self.video_stream = video_stream
-        self.log = log or init_logger('faceid')
-        self.frame_buffer = FrameBuffer(log=self.log) if show else None
+        self.frame_buffer = FrameBuffer() if show else None
         self.tracker = TargetTracker(video_stream.size)
         self.join_event = Event()
         super().__init__(name='FaceWatcher')
+
+    @property
+    def log(self):
+        return logging.getLogger(settings.logger)
 
     def run(self):
         self.log.info('Start watching faces...')

@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from pathlib import Path
 
 import joblib
@@ -7,16 +8,18 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import matthews_corrcoef, classification_report
 
-from .model import builder, optimizer
-from utils.logger import init_logger
 from cfg import settings
+from .model import builder, optimizer
 
 
 class FaceClassifier:
 
-    def __init__(self, model_path=None, log=None):
-        self.log = log or init_logger('faceid')
+    def __init__(self, model_path=None):
         self.model = self.load(model_path)
+
+    @property
+    def log(self):
+        return logging.getLogger(settings.logger)
 
     def get_faces(self, path):
         self.log.info(f'Load face vectors from {path}')

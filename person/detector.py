@@ -1,11 +1,11 @@
 import os
 import json
+import logging
 
 import cv2
 import numpy as np
 
 from cfg import settings
-from utils.logger import init_logger
 from vision.predictor.abc import Predictor
 
 
@@ -14,9 +14,12 @@ class PersonDetector(Predictor):
     DETECT_IMAGE_SIZE = (300, 300)
     DETECT_PROBA_THRES = 0.75
 
-    def __init__(self, log=None):
-        self.log = log or init_logger('faceid')
+    def __init__(self):
         self.load_models()
+
+    @property
+    def log(self):
+        return logging.getLogger(settings.logger)
 
     def load_models(self):
         pwd = os.getcwd()

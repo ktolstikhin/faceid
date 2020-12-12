@@ -1,21 +1,25 @@
 import queue
+import logging
 from threading import Thread, Event
 
+from cfg import settings
 from .predictor.factory import PredictorFactory
-from utils.logger import init_logger
 
 
 class VisionTaskHandler(Thread):
 
     QUEUE_GET_TIMEOUT = 5
 
-    def __init__(self, name, task_queue, batch_size=32, log=None):
-        self.log = log or init_logger('faceid')
-        self.predictor = PredictorFactory.build(name, self.log)
+    def __init__(self, name, task_queue, batch_size=32):
+        self.predictor = PredictorFactory.build(name)
         self.task_queue = task_queue
         self.batch_size = batch_size
         self.join_event = Event()
         super().__init__(name='VisionTaskHandler')
+
+    @property
+    def log(self):
+        return logging.getLogger(settings.logger)
 
     def run(self):
         self.log.info('Start handling vision tasks...')

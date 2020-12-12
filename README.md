@@ -88,6 +88,16 @@ cmake --build ./build
 
 sudo python3 setup.py install
 ```
+Также для возможности отображения видео потока в отдельном окне, необходимо установить следующие пакеты:
+```bash
+apt-get install -y \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer1.0-dev \
+    libgtk-3-dev
+```
 
 ## Использование
 

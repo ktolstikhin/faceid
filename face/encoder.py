@@ -1,14 +1,18 @@
+import logging
+
 import dlib
 import numpy as np
 
-from utils.logger import init_logger
+from cfg import settings
+
+
+log = logging.getLogger(settings.logger)
 
 
 class FaceEncoder:
 
-    def __init__(self, model_path, log=None):
-        self.log = log or init_logger('faceid')
-        self.log.info(f'Load a face encoder from {model_path}')
+    def __init__(self, model_path):
+        log.info(f'Load a face encoder from {model_path}')
         self.encoder = dlib.face_recognition_model_v1(model_path)
 
     def encode(self, faces, batch_size=32):

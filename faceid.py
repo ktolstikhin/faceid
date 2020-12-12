@@ -20,7 +20,7 @@ from vision.handler import VisionTaskHandler
 from utils.logger import init_logger
 
 
-log = init_logger('faceid')
+log = init_logger(settings.logger)
 
 
 @click.group()
@@ -44,7 +44,7 @@ def run(task_handlers, batch_size, show):
         log.info(f'Start {task_handlers} vision task handler(s)...')
 
         for _ in range(task_handlers):
-            h = VisionTaskHandler('face', task_queue, batch_size, log)
+            h = VisionTaskHandler('face', task_queue, batch_size)
             h.start()
             handlers.append(h)
 
@@ -54,12 +54,12 @@ def run(task_handlers, batch_size, show):
         for conf_file in settings.video_conf_files:
             video_stream = create_stream(conf_file)
             log.info(f'Start video stream from {video_stream.path}')
-            w = FaceWatcher(task_queue, video_stream, show, log)
+            w = FaceWatcher(task_queue, video_stream, show)
             w.start()
             watchers.append(w)
 
         target_keeper = TargetKeeper()
-        frame_buffer = FrameBuffer(log=log) if show else None
+        frame_buffer = FrameBuffer() if show else None
 
         while True:
             tracked = target_keeper.get()
@@ -117,7 +117,7 @@ def live(conf_json, output):
     if output is not None:
         os.makedirs(output, exist_ok=True)
 
-    frame_buffer = FrameBuffer(output, log)
+    frame_buffer = FrameBuffer(output)
     video_stream = create_stream(conf_json)
     log.info(f'Start video stream from {video_stream.path}')
 
@@ -155,7 +155,7 @@ def train(facedb, test_size, output, optimize):
     '''
     log.info(f'Train a face recognizer on the face database {facedb}')
 
-    clf = FaceClassifier(log=log)
+    clf = FaceClassifier()
     clf.train(facedb, test_size, optimize)
 
     if output is None:
@@ -181,7 +181,7 @@ def test(facedb, model, output):
     '''
     log.info(f'Test a face recognizer on the face database {facedb}')
 
-    clf = FaceClassifier(model, log)
+    clf = FaceClassifier(model)
     score = clf.test(facedb)
 
     score_json = json.dumps(score['macro avg'], indent=2)
@@ -208,7 +208,7 @@ def db():
 def init(facedb, force):
     '''Initialize a face database.
     '''
-    recognizer = FaceRecognizer(log)
+    recognizer = FaceRecognizer()
 
     input_files = [os.path.join(facedb, f) for f in os.listdir(facedb)]
     dirnames = [f for f in input_files if os.path.isdir(f)]

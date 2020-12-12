@@ -1,14 +1,18 @@
+import logging
+
 import dlib
 import numpy as np
 
-from utils.logger import init_logger
+from cfg import settings
+
+
+log = logging.getLogger(settings.logger)
 
 
 class FaceDetector:
 
-    def __init__(self, model_path, log=None):
-        self.log = log or init_logger('faceid')
-        self.log.info(f'Load a face detector from {model_path}')
+    def __init__(self, model_path):
+        log.info(f'Load a face detector from {model_path}')
         self.detector = dlib.cnn_face_detection_model_v1(model_path)
 
     def detect(self, images, batch_size=32, upsample=1):

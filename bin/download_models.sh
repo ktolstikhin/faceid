@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 cd $(dirname $(dirname $(realpath $0)))
 model_path=${1:-models}
 

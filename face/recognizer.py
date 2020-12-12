@@ -1,19 +1,17 @@
 import os
 import json
 
-from .aligner import FaceAligner
-from .encoder import FaceEncoder
-from .detector import FaceDetector
-from .classifier import FaceClassifier
-from vision.predictor.abc import Predictor
-from utils.logger import init_logger
 from cfg import settings
+from vision.predictor.abc import Predictor
+from .aligner import FaceAligner
+from .classifier import FaceClassifier
+from .detector import FaceDetector
+from .encoder import FaceEncoder
 
 
 class FaceRecognizer(Predictor):
 
-    def __init__(self, log=None):
-        self.log = log or init_logger('faceid')
+    def __init__(self):
         self.load_models()
 
     def load_models(self):
@@ -23,10 +21,10 @@ class FaceRecognizer(Predictor):
         with open(settings.model_conf_file) as f:
             cfg = json.load(f)
 
-        self.aligner = FaceAligner(cfg['face_shape_predictor'], self.log)
-        self.detector = FaceDetector(cfg['face_detector'], self.log)
-        self.encoder = FaceEncoder(cfg['face_encoder'], self.log)
-        self.clf = FaceClassifier(cfg['face_classifier'], self.log)
+        self.aligner = FaceAligner(cfg['face_shape_predictor'])
+        self.detector = FaceDetector(cfg['face_detector'])
+        self.encoder = FaceEncoder(cfg['face_encoder'])
+        self.clf = FaceClassifier(cfg['face_classifier'])
 
         os.chdir(pwd)
 
