@@ -1,19 +1,19 @@
 # FaceID
 
-Система компьютерного зрения, предназначенная для поиска и распознавания лиц в видео потоке на основе имеющейся базы изображений известных лиц. Функционал модулей компьютерного зрения реализован с использованием библиотек [Dlib](http://dlib.net/), [OpenCV](https://opencv.org/), а также [TensorFlow](https://www.tensorflow.org/). Алгоритмы классификации лиц построены с использованием фреймворков [scikit-learn](https://scikit-learn.org/stable/), [NumPy](https://numpy.org/) и [SciPy](https://www.scipy.org/).
+This is a proof-of-concept of a computer vision system used for face detection and recognition in a video stream using a face database of known persons. The computer vision functionality is based on [Dlib](http://dlib.net/), [OpenCV](https://opencv.org/), and [TensorFlow](https://www.tensorflow.org/). The classification algorithms are built using [scikit-learn](https://scikit-learn.org/stable/), [NumPy](https://numpy.org/), and [SciPy](https://www.scipy.org/).
 
-## Описание
+## Description
 
-Управление всеми функциями проекта осуществляется через использование выполняемого скрипта `faceid.py`, находящегося в корневой директории проекта. Настройки проекта хранятся в директории `cfg`:
+The project root directory contains the main CLI script `faceid.py`. The project settings are stored in the `cfg` directory which includes the following:
 
-* Файл `models.json` хранит пути к предобученным моделям детектора, энкодера и классификатора лиц.
-* Файл `settings.py` содержит настройки программных модулей проекта.
-* В директории `video` находятся `json` файлы конфигураций используемых видео устройств.
+* File `models.json` contains paths to pre-trained models of face detector, encoder, and classifier.
+* File `settings.py` stores module settings.
+* The `video` folder contains `json` configuration files used to initialize video devices.
 
-Файл `faceid.py` является CLI проекта и реализует такие функции, как:
+The `faceid.py` project's CLI is used to:
 
-* Запуск процесса чтения из видео устройств и отображение найденных и распознанных лиц.
-* Составление и инициализация базы данных лиц. База данных представляет из себя директорию, разбитую на поддиректории с названиями меток классов известных лиц. Например:
+* Start video streaming and displaying recognized faces.
+* Create and initialize a face database. The database is just a folder with subfolders named after class labels (names) of known persons. For example:
 
 ```bash
 .
@@ -33,43 +33,43 @@
     ├── 0251ece9d7d94d3cb7832f7c4a247898.npy
     ...
 ```
-Здесь файлы с расширением `.npy` хранят векторные представления лиц, которые используются классификатором для идентификации лиц, найденных детектором лиц. Файлы с окончанием `_aligned.jpg` хранят вырезанные и выровненные изображения лиц, найденных на соответствующих изображениях. Выровненные изображения в свою очередь используются для создания векторных представлений лиц.
+Here, files with `.npy` extension are vector embeddings of faces used by a classifier to predict faces found by a face detector in a video stream. Files with `_aligned.jpg` suffix store cropped and aligned faces found on the corresponding images. The aligned faces are used to build face embeddings.
 
-* Обучение и тестирование моделей классификатора лиц, построенной на базе алгоритма k ближайших соседей ([k-nearest neighbors](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm)).
-* Работа с видео устройствами, их конфигурирование и чтение видео потока в реальном времени.
+* Train and test classifier model built on top of [k-nearest neighbors algorithm](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm)
+* Initialize, configure, and read video devices in real time.
 
-Процесс поиска и распознавания лиц в видео потоке можно описать упрощённо в виде следующей последовательности:
+The process of detection and recognition of faces in a video stream could be briefly explained as following:
 
-1. В отдельном потоке считываются кадры из видео устройства. Для каждого устройства создаётся отдельный поток.
-2. Далее кадры со всех потоков отправляются в очередь для распознавания.
-3. Распознавание происходит в отдельных потоках, которые постоянно забирают пачками кадры из очереди.
-4. Процесс распознавания включает в себя последовательное выполнение следующих шагов для каждого полученного кадра:
-    * Модель детектора лиц определяет положения лиц на фотографии.
-    * Далее найденные лица вырезаются и посылаются на вход модели определителя ключевых точек лиц для выравнивания.
-    * После этого выравненные лица подаются на вход модели энкодера лиц для получения векторных представлений лиц (embeddings).
-    * Полученные вектора лиц подаются на вход модели классификатора лиц, которая присваивает каждому найденному лицу метку класса, если вероятность полученного предсказания не ниже заданного порога. В противном случае лицо помечается как незнакомое (`Unknown_Face`).
-5. Полученные результаты становятся доступными считывающему потоку.
-6. Далее найденные лица передаются трекеру объектов, который присваивает им уникальные ID номера и отслеживает их положения в кадре и их статусы. При этом он обновляет состояния распознанных объектов в глобальном реестре лиц, который доступен в основном потоке программы для чтения и модификации.
+1. Frames from a video device are fetched in a separate stream. A separate thread is created for each device.
+2. Frames from all streams are sent to a queue for recognition.
+3. Recognition occurs in separate threads, which constantly take frames from the queue in batches.
+4. The recognition process includes sequential execution of the following steps for each received frame:
+    * The face detector model detects positions of faces on the input image.
+    * Next, the found faces are cut out and sent as inputs to the face landmark model whose predictions are used for face alignment.
+    * After that, the aligned faces are fed to the face encoder model, which produces vector representations of faces (face embeddings).
+    * The resulting embeddings are fed to the face classifier model, which assigns a class label to each found face if the prediction probability is not lower than a defined threshold. Otherwise, the face is marked as `Unknown_Face`.
+5. The obtained results then become available to the stream reading thread.
+6. Further, the found faces are passed to an object tracker, which assigns them unique ID numbers and tracks their positions in the frame and their statuses. It updates states of the recognized objects in the global person register.
 
-## Установка
+## Installation
 
-Для работы модуля необходимо скачать предобученные модели. Для этого запустите скрипт `download_models.sh`:
+It is required to download pre-trained models first by invoking the `download_models.sh` script:
 ```bash
 ./bin/download_models.sh
 ```
-В результате выполнения скрипта в корневой директории проекта появится папка `models`, содержащая файлы моделей:
+As a result, in the project's root a folder named `models` will be created with the following content:
 ```bash
-ssd_mobilenet_v1_coco_2017_11_17           # детектор людей
-dlib_face_recognition_resnet_model_v1.dat  # энкодер лиц
-mmod_human_face_detector.dat               # детектор лиц
-shape_predictor_5_face_landmarks.dat       # определитель 5 ключевых точек лиц
-shape_predictor_68_face_landmarks.dat      # определитель 68 ключевых точек лиц (используется по умолчанию)
+ssd_mobilenet_v1_coco_2017_11_17           # person detector
+dlib_face_recognition_resnet_model_v1.dat  # face encoder
+mmod_human_face_detector.dat               # face detector
+shape_predictor_5_face_landmarks.dat       # 5 points face landmark detector
+shape_predictor_68_face_landmarks.dat      # 68 points face landmark detector (used by default)
 ```
-После этого установите зависимости, указанные в файле `requirements.txt`:
+Then, install dependencies listed in the `requirements.txt` file provided in the project's root folder. You can use `pip` to install them:
 ```bash
 pip3 install --user -r requirements.txt
 ```
-Кроме этого необходимо установить драйвера [NVIDIA](https://www.nvidia.com/Download/index.aspx?lang=en-us), платформу для параллельных вычислений [CUDA](https://developer.nvidia.com/cuda-zone), а также библиотеку [NVIDIA cuDNN](https://developer.nvidia.com/cudnn), следуя официальным инструкциям. Далее необходимо установить библиотеку [Dlib](http://dlib.net/), перед этим скомпилировав её из исходников для обеспечения поддержки платформы CUDA:
+Also, it is required to install [NVIDIA](https://www.nvidia.com/Download/index.aspx?lang=en-us) drivers, [CUDA](https://developer.nvidia.com/cuda-zone), and [NVIDIA cuDNN](https://developer.nvidia.com/cudnn) libraries by following the official instructions. Then, install [Dlib](http://dlib.net/) library with the CUDA support by compiling it from source:
 ```bash
 apt-get update && apt-get install -y \
     gcc-6 \
@@ -88,7 +88,7 @@ cmake --build ./build
 
 sudo python3 setup.py install
 ```
-Также для возможности отображения видео потока в отдельном окне, необходимо установить следующие пакеты:
+Also, in order to be able to display video streams, you will need the following libraries installed:
 ```bash
 apt-get install -y \
     libavcodec-dev \
@@ -99,39 +99,35 @@ apt-get install -y \
     libgtk-3-dev
 ```
 
-## Использование
+## Usage
 
-Пережде, чем приступить непосредственно к чтению видео потока, поиску и распознаванию найденных лиц, необходимо создать и инициализировать базу известных лиц, а также обучить на ней модель классификатора лиц. Для этого необходимо разбить изображения с лицами известных людей по папкам, названными согласно меткам классов, присвоенных данным людям. Далее необходимо инициализировать данную базу лиц:
+First, before actually reading a video stream, detect, and recognize found faces, it is required to initialize a database of known faces, and use it to train the classifier model. In order to do this, you have to split face images between subfolders named after class labels (names) assigned to corresponding persons. Then, initialize the resulting face database:
 ```bash
 ./faceid.py db init -f /path/to/face/db
 ```
-После этого в папках с изображениями известных лиц появятся векторные представления лиц (файлы с расширением `npy`). Далее нужно обучить модель классификатора, используя инициализированную базу данных:
+This creates face embeddings in subfolders (files with `npy` extension). Then, train a face classifier model using the initialized face database:
 ```bash
 ./faceid.py model train -f /path/to/face/db -o ./models/face_clf.pkl --optimize
 ```
-В результате обученная модель будет сохранена в файл `face_clf.pkl` в папке моделей `models`. Также можно протестировать полученную модель на какой-либо другой инициализированной базе данных следующим образом:
+Once the training is over, the classifier model `face_clf.pkl` will be saved to the `models` folder. You can test accuracy of the trained model using another face database as follows:
 ```bash
 ./faceid.py model test -f /path/to/other/db -m ./models/face_clf.pkl
 ```
-После того, как была обучена модель классификатора, можно приступить к чтению видео потоков:
+Now, you can start reading video streams:
 ```bash
 ./faceid.py run --show
 ```
-Нужно помнить, что отображение видео потоков и распознанных объектов в них (аргумент `--show`) существенно замедляет работу всей системы и поэтому должно использоваться только в отладочных целях. Для конфигурирования видео устройств, используя настройки `cfg/video/*.json`, выполните следующую команду:
+Note, that displaying video streams and recognized faces on them (the `--show` option) dramatically slows down the whole system, so you should use it for debug purposes only. In order to initialize video devices using configuration files `cfg/video/*.json`, run the following command:
 ```bash
 ./faceid.py video config
 ```
-Для сброса настроек видео устройств, выполните предыдущую команду с аргументом `--reset`. Возможно создать *ad hoc* базу данных, используя видео поток с какого-либо устройства:
+In order to reset device settings, run the previous command with the `--reset` option. It is possible to make an *ad hoc* face database by using a video stream from any available video device:
 ```bash
 ./faceid.py video live -c cfg/video/camera1.json -o /path/to/face/db/John_Smith
 ```
-Далее при нажатии клавиши `s` будет происходить сохранение снимка экрана в указанную директорию `John_Smith`. При нажатии `q` чтение прекратится.
+Here, by pressing the `s` button an image will be saved in the `John_Smith` folder. The `q` button stops the program.
 
-## Обучение
+## Training
 
-При необходимости обучения модели энкодера лиц на собранной базе лиц, например, азиатов, нужно следовать инструкциям, указанным [здесь](https://github.com/ageitgey/face_recognition/wiki/Face-Recognition-Accuracy-Problems#question-can-i-re-train-the-face-encoding-model-to-make-it-more-accurate-for-my-images), а также [данному примеру](http://dlib.net/dnn_metric_learning_on_images_ex.cpp.html).
-
-## Авторы
-
-Copyright (c) 2019 Konstantin Tolstikhin <k.tolstikhin@gmail.com>
+In the case you have to train the face encoder model on the custom dataset, you may find instructions provided [here](https://github.com/ageitgey/face_recognition/wiki/Face-Recognition-Accuracy-Problems#question-can-i-re-train-the-face-encoding-model-to-make-it-more-accurate-for-my-images), and [here](http://dlib.net/dnn_metric_learning_on_images_ex.cpp.html) helpful.
 
